@@ -19,6 +19,7 @@ export default function MusicScreen() {
   const [showRegionModal, setShowRegionModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(true);
 
   const regions = [
     { code: 'US', name: 'United States', flag: '🇺🇸' },
@@ -987,7 +988,10 @@ export default function MusicScreen() {
         <View style={styles.youtubeLogoContainer}>
           <Text style={styles.youtubeLogo}>Wyldseed</Text>
         </View>
-        <TouchableOpacity style={styles.menuButton}>
+        <TouchableOpacity 
+          style={styles.menuButton}
+          onPress={() => setSidebarVisible(!sidebarVisible)}
+        >
           <MoreVertical size={24} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -1135,9 +1139,27 @@ export default function MusicScreen() {
 
   const renderVideoContent = () => (
     <View style={styles.youtubeLayout}>
-      {renderYouTubeSidebar()}
-      <View style={styles.youtubeMainContent}>
-        {renderVideosHeader()}
+      <View style={[styles.youtubeSidebarContainer, sidebarVisible && styles.youtubeSidebarVisible]}>
+        {renderYouTubeSidebar()}
+      </View>
+      {sidebarVisible && (
+        <TouchableOpacity 
+          style={styles.sidebarOverlay}
+          onPress={() => setSidebarVisible(false)}
+          activeOpacity={1}
+        />
+      )}
+      <View style={[styles.youtubeMainContent, !sidebarVisible && styles.youtubeMainContentExpanded]}>
+        <View style={styles.youtubeMainHeader}>
+          <TouchableOpacity 
+            style={styles.sidebarToggleButton}
+            onPress={() => setSidebarVisible(!sidebarVisible)}
+          >
+            <MoreVertical size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.youtubeMainTitle}>Videos</Text>
+          <View style={styles.placeholder} />
+        </View>
         {renderVideoFilters()}
         
         <View style={styles.youtubeVideosList}>
@@ -1766,11 +1788,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#0F0F0F',
   },
   youtubeSidebar: {
-    width: 240,
+    width: '100%',
     backgroundColor: '#0F0F0F',
-    borderRightWidth: 1,
-    borderRightColor: '#272727',
-    paddingTop: 60,
+    paddingTop: 0,
   },
   youtubeMainContent: {
     flex: 1,
@@ -2895,5 +2915,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#1DB954',
+  },
+  youtubeMainContentExpanded: {
+    flex: 1,
+  },
+  youtubeMainHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  sidebarToggleButton: {
+    padding: 8,
+  },
+  youtubeMainTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  youtubeSidebarContainer: {
+    width: width < 768 ? 280 : 240,
+    backgroundColor: '#0F0F0F',
+    borderRightWidth: 1,
+    borderRightColor: '#272727',
+    paddingTop: 60,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    zIndex: 10,
+    transform: [{ translateX: -280 }],
+  },
+  youtubeSidebarVisible: {
+    transform: [{ translateX: 0 }],
+  },
+  sidebarOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });
