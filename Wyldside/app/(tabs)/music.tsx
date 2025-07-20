@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions, Modal } from 'react-native';
 import { Play, Shuffle, MoveVertical as MoreVertical, Video, Music as MusicIcon, X, Heart, Download, Plus, Pause, SkipBack, SkipForward, Volume2, VolumeX, ShoppingBag, Star, Tag, Bell, Cast, Search, Filter, Globe, ChevronDown, Check } from 'lucide-react-native';
 import { useState } from 'react';
@@ -788,70 +789,208 @@ export default function MusicScreen() {
     </View>
   );
 
+  const renderYouTubeSidebar = () => (
+    <View style={styles.youtubeSidebar}>
+      {/* YouTube Logo and Menu */}
+      <View style={styles.youtubeSidebarHeader}>
+        <View style={styles.youtubeLogoContainer}>
+          <Text style={styles.youtubeLogo}>YouTube</Text>
+        </View>
+        <TouchableOpacity style={styles.menuButton}>
+          <MoreVertical size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Main Navigation */}
+      <View style={styles.sidebarSection}>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🏠</Text>
+          </View>
+          <Text style={styles.sidebarText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>▶️</Text>
+          </View>
+          <Text style={styles.sidebarText}>Shorts</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>📺</Text>
+          </View>
+          <Text style={styles.sidebarText}>Subscriptions</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* You Section */}
+      <View style={styles.sidebarSection}>
+        <Text style={styles.sidebarSectionTitle}>You</Text>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>⏰</Text>
+          </View>
+          <Text style={styles.sidebarText}>History</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>📋</Text>
+          </View>
+          <Text style={styles.sidebarText}>Playlists</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>📹</Text>
+          </View>
+          <Text style={styles.sidebarText}>Your videos</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>⏰</Text>
+          </View>
+          <Text style={styles.sidebarText}>Watch later</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>👍</Text>
+          </View>
+          <Text style={styles.sidebarText}>Liked videos</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Subscriptions Section */}
+      <View style={styles.sidebarSection}>
+        <Text style={styles.sidebarSectionTitle}>Subscriptions</Text>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🎤</Text>
+          </View>
+          <Text style={styles.sidebarText}>TEDx Talks</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🧠</Text>
+          </View>
+          <Text style={styles.sidebarText}>Lex Fridman</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🐙</Text>
+          </View>
+          <Text style={styles.sidebarText}>GitHub</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🎵</Text>
+          </View>
+          <Text style={styles.sidebarText}>The Weeknd</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🎵</Text>
+          </View>
+          <Text style={styles.sidebarText}>Post Malone</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>📊</Text>
+          </View>
+          <Text style={styles.sidebarText}>Show more</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Explore Section */}
+      <View style={styles.sidebarSection}>
+        <Text style={styles.sidebarSectionTitle}>Explore</Text>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🔥</Text>
+          </View>
+          <Text style={styles.sidebarText}>Trending</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🎵</Text>
+          </View>
+          <Text style={styles.sidebarText}>Music</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🎮</Text>
+          </View>
+          <Text style={styles.sidebarText}>Gaming</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
   const renderVideoContent = () => (
-    <>
-      {renderVideosHeader()}
-      {renderVideoFilters()}
-      
-      <View style={styles.youtubeVideosList}>
-        {musicVideos.map((video) => (
-          <TouchableOpacity 
-            key={video.id} 
-            style={styles.youtubeVideoItem}
-            onPress={() => setSelectedVideo(video)}
-          >
-            <View style={styles.youtubeVideoThumbnailContainer}>
-              <Image source={{ uri: video.image }} style={styles.youtubeVideoThumbnail} />
-              <View style={styles.youtubePlayOverlay}>
-                <Play size={20} color="#fff" fill="#fff" />
-              </View>
-              <View style={styles.youtubeVideoDuration}>
-                <Text style={styles.youtubeVideoDurationText}>{video.duration}</Text>
-              </View>
-              {video.isNew && (
-                <View style={styles.youtubeNewBadge}>
-                  <Text style={styles.youtubeNewBadgeText}>NEW</Text>
+    <View style={styles.youtubeLayout}>
+      {renderYouTubeSidebar()}
+      <View style={styles.youtubeMainContent}>
+        {renderVideosHeader()}
+        {renderVideoFilters()}
+        
+        <View style={styles.youtubeVideosList}>
+          {musicVideos.map((video) => (
+            <TouchableOpacity 
+              key={video.id} 
+              style={styles.youtubeVideoItem}
+              onPress={() => setSelectedVideo(video)}
+            >
+              <View style={styles.youtubeVideoThumbnailContainer}>
+                <Image source={{ uri: video.image }} style={styles.youtubeVideoThumbnail} />
+                <View style={styles.youtubePlayOverlay}>
+                  <Play size={20} color="#fff" fill="#fff" />
                 </View>
-              )}
-              {video.taggedItems && video.taggedItems.length > 0 && (
-                <View style={styles.youtubeShoppableBadge}>
-                  <ShoppingBag size={10} color="#fff" />
-                  <Text style={styles.youtubeShoppableBadgeText}>SHOP</Text>
+                <View style={styles.youtubeVideoDuration}>
+                  <Text style={styles.youtubeVideoDurationText}>{video.duration}</Text>
                 </View>
-              )}
-            </View>
-            
-            <View style={styles.youtubeVideoContent}>
-              <View style={styles.youtubeVideoInfo}>
-                <Text style={styles.youtubeVideoTitle} numberOfLines={2}>{video.title}</Text>
-                <View style={styles.youtubeVideoMeta}>
-                  <View style={styles.youtubeChannelInfo}>
-                    <Text style={styles.youtubeChannelName}>{video.channel}</Text>
-                    {video.isVerified && (
-                      <View style={styles.youtubeVerifiedBadge}>
-                        <Text style={styles.youtubeVerifiedIcon}>✓</Text>
-                      </View>
-                    )}
+                {video.isNew && (
+                  <View style={styles.youtubeNewBadge}>
+                    <Text style={styles.youtubeNewBadgeText}>NEW</Text>
                   </View>
-                  <Text style={styles.youtubeVideoStats}>
-                    {video.views} views • {video.uploadTime}
-                  </Text>
-                  {video.taggedItems && (
-                    <Text style={styles.youtubeTaggedItemsCount}>
-                      🛍️ {video.taggedItems.length} items featured
-                    </Text>
-                  )}
-                </View>
+                )}
+                {video.taggedItems && video.taggedItems.length > 0 && (
+                  <View style={styles.youtubeShoppableBadge}>
+                    <ShoppingBag size={10} color="#fff" />
+                    <Text style={styles.youtubeShoppableBadgeText}>SHOP</Text>
+                  </View>
+                )}
               </View>
               
-              <TouchableOpacity style={styles.youtubeMoreButton}>
-                <MoreVertical size={20} color="#999" />
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        ))}
+              <View style={styles.youtubeVideoContent}>
+                <View style={styles.youtubeVideoInfo}>
+                  <Text style={styles.youtubeVideoTitle} numberOfLines={2}>{video.title}</Text>
+                  <View style={styles.youtubeVideoMeta}>
+                    <View style={styles.youtubeChannelInfo}>
+                      <Text style={styles.youtubeChannelName}>{video.channel}</Text>
+                      {video.isVerified && (
+                        <View style={styles.youtubeVerifiedBadge}>
+                          <Text style={styles.youtubeVerifiedIcon}>✓</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={styles.youtubeVideoStats}>
+                      {video.views} views • {video.uploadTime}
+                    </Text>
+                    {video.taggedItems && (
+                      <Text style={styles.youtubeTaggedItemsCount}>
+                        🛍️ {video.taggedItems.length} items featured
+                      </Text>
+                    )}
+                  </View>
+                </View>
+                
+                <TouchableOpacity style={styles.youtubeMoreButton}>
+                  <MoreVertical size={20} color="#999" />
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
-    </>
+    </View>
   );
 
   return (
@@ -1217,6 +1356,77 @@ const styles = StyleSheet.create({
   },
   youtubeMoreButton: {
     padding: 4,
+  },
+  // YouTube Layout and Sidebar
+  youtubeLayout: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#0F0F0F',
+  },
+  youtubeSidebar: {
+    width: 240,
+    backgroundColor: '#0F0F0F',
+    borderRightWidth: 1,
+    borderRightColor: '#272727',
+    paddingTop: 60,
+  },
+  youtubeMainContent: {
+    flex: 1,
+    backgroundColor: '#0F0F0F',
+  },
+  youtubeSidebarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#272727',
+  },
+  youtubeLogoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  youtubeLogo: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FF0000',
+  },
+  menuButton: {
+    padding: 4,
+  },
+  sidebarSection: {
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#272727',
+  },
+  sidebarSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  sidebarItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  sidebarIconContainer: {
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  sidebarIcon: {
+    fontSize: 18,
+  },
+  sidebarText: {
+    fontSize: 14,
+    color: '#fff',
+    fontWeight: '500',
   },
   // Category Grid
   categoryGrid: {
