@@ -1,7 +1,7 @@
 [build]
   base = "Wyldside"
   command = "npm run build:web"
-  publish = "web-build"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "20.19.4"
