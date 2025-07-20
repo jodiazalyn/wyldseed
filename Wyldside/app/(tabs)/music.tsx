@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions, Modal } from 'react-native';
-import { Play, Shuffle, MoveVertical as MoreVertical, Video, Music as MusicIcon, X, Heart, Download, Plus, Pause, SkipBack, SkipForward, Volume2, VolumeX, ShoppingBag, Star, Tag, Bell, Cast, Search, Filter, Globe, ChevronDown, Check } from 'lucide-react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions, Modal, TextInput } from 'react-native';
+import { Play, Shuffle, MoveVertical as MoreVertical, Video, Music as MusicIcon, X, Heart, Download, Plus, Pause, SkipBack, SkipForward, Volume2, VolumeX, ShoppingBag, Star, Tag, Bell, Cast, Search, Filter, Globe, ChevronDown, Check, MessageCircle, Send, Brain } from 'lucide-react-native';
 import { useState } from 'react';
 import { MusicPlayer } from '@/components/MusicPlayer';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,6 +17,8 @@ export default function MusicScreen() {
   const [activeVideoFilter, setActiveVideoFilter] = useState('All');
   const [selectedRegion, setSelectedRegion] = useState('US');
   const [showRegionModal, setShowRegionModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const regions = [
     { code: 'US', name: 'United States', flag: '🇺🇸' },
@@ -223,7 +225,8 @@ export default function MusicScreen() {
           rating: 4.8,
           category: "Sneakers",
           timeTag: "0:45",
-          description: "Classic basketball shoe with premium leather upper"
+          description: "Classic basketball shoe with premium leather upper",
+          aiAnalysis: "Confident, bold style - perfect for streetwear enthusiasts"
         },
         {
           id: 2,
@@ -235,7 +238,8 @@ export default function MusicScreen() {
           rating: 4.6,
           category: "Apparel",
           timeTag: "1:23",
-          description: "Premium cotton hoodie with embroidered OVO owl logo"
+          description: "Premium cotton hoodie with embroidered OVO owl logo",
+          aiAnalysis: "Luxury streetwear - matches Drake's sophisticated aesthetic"
         },
         {
           id: 3,
@@ -247,7 +251,8 @@ export default function MusicScreen() {
           rating: 4.9,
           category: "Jewelry",
           timeTag: "2:10",
-          description: "18k gold Cuban link chain, 20 inches"
+          description: "18k gold Cuban link chain, 20 inches",
+          aiAnalysis: "Status symbol - reflects success and confidence"
         },
         {
           id: 4,
@@ -259,7 +264,34 @@ export default function MusicScreen() {
           rating: 4.7,
           category: "Accessories",
           timeTag: "3:15",
-          description: "Classic aviator style with polarized lenses"
+          description: "Classic aviator style with polarized lenses",
+          aiAnalysis: "Timeless accessory - adds mystery and cool factor"
+        },
+        {
+          id: 5,
+          name: "Premium Denim Jacket",
+          brand: "Levi's",
+          price: "$120",
+          originalPrice: "$150",
+          image: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg",
+          rating: 4.5,
+          category: "Apparel",
+          timeTag: "4:20",
+          description: "Classic denim jacket with premium wash",
+          aiAnalysis: "Versatile layering piece - perfect for any season"
+        },
+        {
+          id: 6,
+          name: "Wireless Earbuds",
+          brand: "Apple",
+          price: "$249",
+          originalPrice: "$279",
+          image: "https://images.pexels.com/photos/3780681/pexels-photo-3780681.jpeg",
+          rating: 4.9,
+          category: "Electronics",
+          timeTag: "5:00",
+          description: "AirPods Pro with active noise cancellation",
+          aiAnalysis: "Essential for music lovers - matches the audio theme"
         }
       ]
     },
@@ -286,7 +318,8 @@ export default function MusicScreen() {
           rating: 4.9,
           category: "Sneakers",
           timeTag: "1:15",
-          description: "Iconic basketball shoe with leather upper"
+          description: "Iconic basketball shoe with leather upper",
+          aiAnalysis: "Humble yet powerful - reflects Kendrick's message"
         },
         {
           id: 6,
@@ -298,7 +331,34 @@ export default function MusicScreen() {
           rating: 4.5,
           category: "Apparel",
           timeTag: "0:30",
-          description: "Classic three-stripe tracksuit in black"
+          description: "Classic three-stripe tracksuit in black",
+          aiAnalysis: "Athletic comfort - perfect for active lifestyle"
+        },
+        {
+          id: 7,
+          name: "Baseball Cap",
+          brand: "New Era",
+          price: "$35",
+          originalPrice: "$45",
+          image: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
+          rating: 4.3,
+          category: "Accessories",
+          timeTag: "2:00",
+          description: "Classic fitted cap with embroidered logo",
+          aiAnalysis: "Street culture essential - adds authenticity"
+        },
+        {
+          id: 8,
+          name: "Gold Watch",
+          brand: "Rolex",
+          price: "$12,000",
+          originalPrice: "$15,000",
+          image: "https://images.pexels.com/photos/1697214/pexels-photo-1697214.jpeg",
+          rating: 4.8,
+          category: "Watches",
+          timeTag: "2:30",
+          description: "Luxury timepiece with diamond accents",
+          aiAnalysis: "Success symbol - represents achievement and status"
         }
       ]
     },
@@ -489,7 +549,7 @@ export default function MusicScreen() {
         animationType="slide"
         onRequestClose={() => setSelectedVideo(null)}
       >
-        <View style={styles.videoPlayerContainer}>
+        <ScrollView style={styles.videoPlayerContainer} showsVerticalScrollIndicator={false}>
           {/* Video Player */}
           <View style={styles.videoPlayerWrapper}>
             <Image 
@@ -557,11 +617,33 @@ export default function MusicScreen() {
             </View>
           </View>
 
+          {/* AI Analysis Section */}
+          <View style={styles.aiAnalysisSection}>
+            <View style={styles.aiAnalysisHeader}>
+              <Brain size={20} color="#1DB954" />
+              <Text style={styles.aiAnalysisTitle}>AI Style Analysis</Text>
+            </View>
+            <View style={styles.aiAnalysisContent}>
+              <View style={styles.aiAnalysisCard}>
+                <Text style={styles.aiAnalysisLabel}>Mood Detected:</Text>
+                <Text style={styles.aiAnalysisValue}>Confident & Sophisticated</Text>
+              </View>
+              <View style={styles.aiAnalysisCard}>
+                <Text style={styles.aiAnalysisLabel}>Style Category:</Text>
+                <Text style={styles.aiAnalysisValue}>Luxury Streetwear</Text>
+              </View>
+              <View style={styles.aiAnalysisCard}>
+                <Text style={styles.aiAnalysisLabel}>AI Recommendations:</Text>
+                <Text style={styles.aiAnalysisValue}>Based on your style preferences</Text>
+              </View>
+            </View>
+          </View>
+
           {/* Tagged Items Section */}
           <View style={styles.taggedItemsSection}>
             <View style={styles.taggedItemsHeader}>
               <Tag size={20} color="#1DB954" />
-              <Text style={styles.taggedItemsTitle}>Featured in this video</Text>
+              <Text style={styles.taggedItemsTitle}>AI-Curated Featured Items</Text>
             </View>
             
             <ScrollView 
@@ -570,11 +652,22 @@ export default function MusicScreen() {
               style={styles.taggedItemsScroll}
             >
               {selectedVideo.taggedItems?.map((item: any) => (
-                <View key={item.id} style={styles.taggedItemCard}>
+                <TouchableOpacity 
+                  key={item.id} 
+                  style={styles.taggedItemCard}
+                  onPress={() => {
+                    setSelectedItem(item);
+                    setShowCheckout(true);
+                  }}
+                >
                   <View style={styles.taggedItemImageContainer}>
                     <Image source={{ uri: item.image }} style={styles.taggedItemImage} />
                     <View style={styles.timeTagBadge}>
                       <Text style={styles.timeTagText}>{item.timeTag}</Text>
+                    </View>
+                    <View style={styles.aiRecommendationBadge}>
+                      <Brain size={10} color="#fff" />
+                      <Text style={styles.aiRecommendationText}>AI PICK</Text>
                     </View>
                   </View>
                   
@@ -582,6 +675,10 @@ export default function MusicScreen() {
                     <Text style={styles.taggedItemBrand}>{item.brand}</Text>
                     <Text style={styles.taggedItemName} numberOfLines={2}>{item.name}</Text>
                     <Text style={styles.taggedItemDescription} numberOfLines={2}>{item.description}</Text>
+                    
+                    <View style={styles.aiAnalysisItem}>
+                      <Text style={styles.aiAnalysisItemText}>{item.aiAnalysis}</Text>
+                    </View>
                     
                     <View style={styles.taggedItemRating}>
                       <Star size={12} color="#F59E0B" fill="#F59E0B" />
@@ -601,17 +698,111 @@ export default function MusicScreen() {
                       <Text style={styles.shopItemButtonText}>Shop Now</Text>
                     </TouchableOpacity>
                   </View>
-                </View>
+                </TouchableOpacity>
               ))}
             </ScrollView>
 
             {/* Shop All Button */}
             <TouchableOpacity style={styles.shopAllButton}>
-              <Text style={styles.shopAllButtonText}>Shop All Featured Items</Text>
+              <Text style={styles.shopAllButtonText}>Shop All AI-Recommended Items</Text>
               <ShoppingBag size={20} color="#1DB954" />
             </TouchableOpacity>
           </View>
-        </View>
+
+          {/* Comments Section */}
+          <View style={styles.commentsSection}>
+            <View style={styles.commentsHeader}>
+              <MessageCircle size={20} color="#1DB954" />
+              <Text style={styles.commentsTitle}>Comments & Reactions</Text>
+            </View>
+            
+            <ScrollView style={styles.commentsList} showsVerticalScrollIndicator={false}>
+              <View style={styles.commentItem}>
+                <View style={styles.commentAvatar}>
+                  <Text style={styles.commentAvatarText}>JD</Text>
+                </View>
+                <View style={styles.commentContent}>
+                  <View style={styles.commentHeader}>
+                    <Text style={styles.commentAuthor}>John Doe</Text>
+                    <Text style={styles.commentTime}>2 hours ago</Text>
+                  </View>
+                  <Text style={styles.commentText}>This song is fire! 🔥 The AI recommendations are spot on too.</Text>
+                  <View style={styles.commentActions}>
+                    <TouchableOpacity style={styles.commentAction}>
+                      <Heart size={14} color="#666" />
+                      <Text style={styles.commentActionText}>24</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.commentAction}>
+                      <MessageCircle size={14} color="#666" />
+                      <Text style={styles.commentActionText}>Reply</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.commentItem}>
+                <View style={styles.commentAvatar}>
+                  <Text style={styles.commentAvatarText}>SM</Text>
+                </View>
+                <View style={styles.commentContent}>
+                  <View style={styles.commentHeader}>
+                    <Text style={styles.commentAuthor}>Sarah Music</Text>
+                    <Text style={styles.commentTime}>5 hours ago</Text>
+                  </View>
+                  <Text style={styles.commentText}>Love how the AI analyzes the mood and suggests matching styles! 🎯</Text>
+                  <View style={styles.commentActions}>
+                    <TouchableOpacity style={styles.commentAction}>
+                      <Heart size={14} color="#666" />
+                      <Text style={styles.commentActionText}>18</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.commentAction}>
+                      <MessageCircle size={14} color="#666" />
+                      <Text style={styles.commentActionText}>Reply</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.commentItem}>
+                <View style={styles.commentAvatar}>
+                  <Text style={styles.commentAvatarText}>FS</Text>
+                </View>
+                <View style={styles.commentContent}>
+                  <View style={styles.commentHeader}>
+                    <Text style={styles.commentAuthor}>Fashion Sense</Text>
+                    <Text style={styles.commentTime}>1 day ago</Text>
+                  </View>
+                  <Text style={styles.commentText}>The style matching is incredible! Bought the OVO hoodie and it's perfect 👌</Text>
+                  <View style={styles.commentActions}>
+                    <TouchableOpacity style={styles.commentAction}>
+                      <Heart size={14} color="#666" />
+                      <Text style={styles.commentActionText}>32</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.commentAction}>
+                      <MessageCircle size={14} color="#666" />
+                      <Text style={styles.commentActionText}>Reply</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+
+            {/* Add Comment */}
+            <View style={styles.addCommentSection}>
+              <View style={styles.commentInputContainer}>
+                <TextInput 
+                  style={styles.commentInput}
+                  placeholder="Add a comment..."
+                  placeholderTextColor="#666"
+                  multiline
+                />
+                <TouchableOpacity style={styles.commentSendButton}>
+                  <Send size={20} color="#1DB954" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
       </Modal>
     );
   };
@@ -791,46 +982,134 @@ export default function MusicScreen() {
 
   const renderYouTubeSidebar = () => (
     <View style={styles.youtubeSidebar}>
-      {/* YouTube Logo and Menu */}
+      {/* Wyldseed Logo and Menu */}
       <View style={styles.youtubeSidebarHeader}>
         <View style={styles.youtubeLogoContainer}>
-          <Text style={styles.youtubeLogo}>YouTube</Text>
+          <Text style={styles.youtubeLogo}>Wyldseed</Text>
         </View>
         <TouchableOpacity style={styles.menuButton}>
           <MoreVertical size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
-      {/* Main Navigation */}
+      {/* AI Discovery */}
       <View style={styles.sidebarSection}>
+        <Text style={styles.sidebarSectionTitle}>AI Discovery</Text>
         <TouchableOpacity style={styles.sidebarItem}>
           <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>🏠</Text>
+            <Text style={styles.sidebarIcon}>🎯</Text>
           </View>
-          <Text style={styles.sidebarText}>Home</Text>
+          <Text style={styles.sidebarText}>Smart Recommendations</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.sidebarItem}>
           <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>▶️</Text>
+            <Text style={styles.sidebarIcon}>🔍</Text>
           </View>
-          <Text style={styles.sidebarText}>Shorts</Text>
+          <Text style={styles.sidebarText}>AI Music Search</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.sidebarItem}>
           <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>📺</Text>
+            <Text style={styles.sidebarIcon}>🎨</Text>
           </View>
-          <Text style={styles.sidebarText}>Subscriptions</Text>
+          <Text style={styles.sidebarText}>Style Matching</Text>
         </TouchableOpacity>
       </View>
 
-      {/* You Section */}
+      {/* Fashion & Shopping */}
       <View style={styles.sidebarSection}>
-        <Text style={styles.sidebarSectionTitle}>You</Text>
+        <Text style={styles.sidebarSectionTitle}>Fashion & Shopping</Text>
         <TouchableOpacity style={styles.sidebarItem}>
           <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>⏰</Text>
+            <Text style={styles.sidebarIcon}>👕</Text>
           </View>
-          <Text style={styles.sidebarText}>History</Text>
+          <Text style={styles.sidebarText}>Shop Looks</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🛍️</Text>
+          </View>
+          <Text style={styles.sidebarText}>Trending Items</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>💎</Text>
+          </View>
+          <Text style={styles.sidebarText}>Luxury Finds</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🎭</Text>
+          </View>
+          <Text style={styles.sidebarText}>Artist Merch</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Music Categories */}
+      <View style={styles.sidebarSection}>
+        <Text style={styles.sidebarSectionTitle}>Music Categories</Text>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🔥</Text>
+          </View>
+          <Text style={styles.sidebarText}>Trending Music</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🎤</Text>
+          </View>
+          <Text style={styles.sidebarText}>Hip Hop</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🎵</Text>
+          </View>
+          <Text style={styles.sidebarText}>R&B</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🎧</Text>
+          </View>
+          <Text style={styles.sidebarText}>Trap</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>🎶</Text>
+          </View>
+          <Text style={styles.sidebarText}>New Releases</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Social & Sharing */}
+      <View style={styles.sidebarSection}>
+        <Text style={styles.sidebarSectionTitle}>Social & Sharing</Text>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>📱</Text>
+          </View>
+          <Text style={styles.sidebarText}>Post to Social</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>👥</Text>
+          </View>
+          <Text style={styles.sidebarText}>Share with Friends</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>📸</Text>
+          </View>
+          <Text style={styles.sidebarText}>Create Stories</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Your Library */}
+      <View style={styles.sidebarSection}>
+        <Text style={styles.sidebarSectionTitle}>Your Library</Text>
+        <TouchableOpacity style={styles.sidebarItem}>
+          <View style={styles.sidebarIconContainer}>
+            <Text style={styles.sidebarIcon}>❤️</Text>
+          </View>
+          <Text style={styles.sidebarText}>Liked Videos</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.sidebarItem}>
           <View style={styles.sidebarIconContainer}>
@@ -840,85 +1119,15 @@ export default function MusicScreen() {
         </TouchableOpacity>
         <TouchableOpacity style={styles.sidebarItem}>
           <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>📹</Text>
-          </View>
-          <Text style={styles.sidebarText}>Your videos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sidebarItem}>
-          <View style={styles.sidebarIconContainer}>
             <Text style={styles.sidebarIcon}>⏰</Text>
           </View>
-          <Text style={styles.sidebarText}>Watch later</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sidebarItem}>
-          <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>👍</Text>
-          </View>
-          <Text style={styles.sidebarText}>Liked videos</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Subscriptions Section */}
-      <View style={styles.sidebarSection}>
-        <Text style={styles.sidebarSectionTitle}>Subscriptions</Text>
-        <TouchableOpacity style={styles.sidebarItem}>
-          <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>🎤</Text>
-          </View>
-          <Text style={styles.sidebarText}>TEDx Talks</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sidebarItem}>
-          <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>🧠</Text>
-          </View>
-          <Text style={styles.sidebarText}>Lex Fridman</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sidebarItem}>
-          <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>🐙</Text>
-          </View>
-          <Text style={styles.sidebarText}>GitHub</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sidebarItem}>
-          <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>🎵</Text>
-          </View>
-          <Text style={styles.sidebarText}>The Weeknd</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sidebarItem}>
-          <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>🎵</Text>
-          </View>
-          <Text style={styles.sidebarText}>Post Malone</Text>
+          <Text style={styles.sidebarText}>Watch Later</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.sidebarItem}>
           <View style={styles.sidebarIconContainer}>
             <Text style={styles.sidebarIcon}>📊</Text>
           </View>
-          <Text style={styles.sidebarText}>Show more</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Explore Section */}
-      <View style={styles.sidebarSection}>
-        <Text style={styles.sidebarSectionTitle}>Explore</Text>
-        <TouchableOpacity style={styles.sidebarItem}>
-          <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>🔥</Text>
-          </View>
-          <Text style={styles.sidebarText}>Trending</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sidebarItem}>
-          <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>🎵</Text>
-          </View>
-          <Text style={styles.sidebarText}>Music</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sidebarItem}>
-          <View style={styles.sidebarIconContainer}>
-            <Text style={styles.sidebarIcon}>🎮</Text>
-          </View>
-          <Text style={styles.sidebarText}>Gaming</Text>
+          <Text style={styles.sidebarText}>History</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -974,11 +1183,25 @@ export default function MusicScreen() {
                     <Text style={styles.youtubeVideoStats}>
                       {video.views} views • {video.uploadTime}
                     </Text>
-                    {video.taggedItems && (
-                      <Text style={styles.youtubeTaggedItemsCount}>
-                        🛍️ {video.taggedItems.length} items featured
-                      </Text>
-                    )}
+                                      {video.taggedItems && (
+                    <Text style={styles.youtubeTaggedItemsCount}>
+                      🛍️ {video.taggedItems.length} items featured
+                    </Text>
+                  )}
+                  <View style={styles.aiFeaturesContainer}>
+                    <View style={styles.aiFeatureBadge}>
+                      <Text style={styles.aiFeatureIcon}>🤖</Text>
+                      <Text style={styles.aiFeatureText}>AI Style Match</Text>
+                    </View>
+                    <View style={styles.aiFeatureBadge}>
+                      <Text style={styles.aiFeatureIcon}>🎯</Text>
+                      <Text style={styles.aiFeatureText}>Smart Shop</Text>
+                    </View>
+                    <View style={styles.aiFeatureBadge}>
+                      <Text style={styles.aiFeatureIcon}>📱</Text>
+                      <Text style={styles.aiFeatureText}>Share Ready</Text>
+                    </View>
+                  </View>
                   </View>
                 </View>
                 
@@ -992,6 +1215,156 @@ export default function MusicScreen() {
       </View>
     </View>
   );
+
+  const renderCheckoutModal = () => {
+    if (!selectedItem) return null;
+
+    const reviews = [
+      { id: 1, user: "Alex M.", rating: 5, comment: "Perfect fit and amazing quality! The AI recommendation was spot on.", date: "2 days ago" },
+      { id: 2, user: "Sarah K.", rating: 5, comment: "Love this item! Matches my style perfectly. Great purchase.", date: "1 week ago" },
+      { id: 3, user: "Mike R.", rating: 4, comment: "High quality product. The AI really knows my style!", date: "2 weeks ago" },
+      { id: 4, user: "Emma L.", rating: 5, comment: "Exceeded my expectations. Will definitely buy more AI-recommended items.", date: "3 weeks ago" },
+    ];
+
+    const exclusiveDrops = [
+      { id: 1, name: "Limited Edition Colorway", discount: "20% OFF", originalPrice: "$200", newPrice: "$160" },
+      { id: 2, name: "Bundle Deal", discount: "Buy 2 Save 15%", originalPrice: "$300", newPrice: "$255" },
+      { id: 3, name: "Early Access", discount: "VIP Members Only", originalPrice: "$180", newPrice: "$150" },
+    ];
+
+    return (
+      <Modal
+        visible={showCheckout}
+        transparent={false}
+        animationType="slide"
+        onRequestClose={() => setShowCheckout(false)}
+      >
+        <ScrollView style={styles.checkoutContainer} showsVerticalScrollIndicator={false}>
+          {/* Header */}
+          <View style={styles.checkoutHeader}>
+            <TouchableOpacity 
+              style={styles.closeCheckoutButton}
+              onPress={() => setShowCheckout(false)}
+            >
+              <X size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.checkoutTitle}>Product Details</Text>
+            <View style={styles.placeholder} />
+          </View>
+
+          {/* Product Image */}
+          <View style={styles.productImageContainer}>
+            <Image source={{ uri: selectedItem.image }} style={styles.productImage} />
+            <View style={styles.aiRecommendationBadge}>
+              <Brain size={12} color="#fff" />
+              <Text style={styles.aiRecommendationText}>AI RECOMMENDED</Text>
+            </View>
+          </View>
+
+          {/* Product Info */}
+          <View style={styles.productInfoSection}>
+            <Text style={styles.productBrand}>{selectedItem.brand}</Text>
+            <Text style={styles.productName}>{selectedItem.name}</Text>
+            <Text style={styles.productDescription}>{selectedItem.description}</Text>
+            
+            <View style={styles.aiAnalysisItem}>
+              <Text style={styles.aiAnalysisItemText}>{selectedItem.aiAnalysis}</Text>
+            </View>
+
+            <View style={styles.productRating}>
+              <Star size={16} color="#F59E0B" fill="#F59E0B" />
+              <Text style={styles.ratingText}>{selectedItem.rating}</Text>
+              <Text style={styles.categoryText}>• {selectedItem.category}</Text>
+            </View>
+
+            <View style={styles.purchaseStats}>
+              <Text style={styles.purchaseStatsText}>🔥 {Math.floor(Math.random() * 500) + 100} people bought this today</Text>
+              <Text style={styles.purchaseStatsText}>⭐ {Math.floor(Math.random() * 1000) + 500} verified purchases</Text>
+            </View>
+          </View>
+
+          {/* Pricing */}
+          <View style={styles.pricingSection}>
+            <View style={styles.priceRow}>
+              <Text style={styles.currentPrice}>{selectedItem.price}</Text>
+              {selectedItem.originalPrice !== selectedItem.price && (
+                <Text style={styles.originalPrice}>{selectedItem.originalPrice}</Text>
+              )}
+              {selectedItem.originalPrice !== selectedItem.price && (
+                <View style={styles.discountBadge}>
+                  <Text style={styles.discountText}>
+                    {Math.round(((parseInt(selectedItem.originalPrice.replace('$', '')) - parseInt(selectedItem.price.replace('$', ''))) / parseInt(selectedItem.originalPrice.replace('$', ''))) * 100)}% OFF
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+
+          {/* Exclusive Drops */}
+          <View style={styles.exclusiveSection}>
+            <Text style={styles.exclusiveTitle}>🎯 Exclusive Drops</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {exclusiveDrops.map((drop) => (
+                <View key={drop.id} style={styles.exclusiveCard}>
+                  <Text style={styles.exclusiveName}>{drop.name}</Text>
+                  <Text style={styles.exclusiveDiscount}>{drop.discount}</Text>
+                  <View style={styles.exclusivePricing}>
+                    <Text style={styles.exclusiveNewPrice}>{drop.newPrice}</Text>
+                    <Text style={styles.exclusiveOriginalPrice}>{drop.originalPrice}</Text>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+
+          {/* Reviews */}
+          <View style={styles.reviewsSection}>
+            <View style={styles.reviewsHeader}>
+              <Text style={styles.reviewsTitle}>Customer Reviews</Text>
+              <Text style={styles.reviewsCount}>({reviews.length})</Text>
+            </View>
+            
+            {reviews.map((review) => (
+              <View key={review.id} style={styles.reviewItem}>
+                <View style={styles.reviewHeader}>
+                  <Text style={styles.reviewUser}>{review.user}</Text>
+                  <View style={styles.reviewRating}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star 
+                        key={star} 
+                        size={12} 
+                        color={star <= review.rating ? "#F59E0B" : "#666"} 
+                        fill={star <= review.rating ? "#F59E0B" : "none"}
+                      />
+                    ))}
+                  </View>
+                  <Text style={styles.reviewDate}>{review.date}</Text>
+                </View>
+                <Text style={styles.reviewComment}>{review.comment}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Action Buttons */}
+          <View style={styles.checkoutActions}>
+            <TouchableOpacity style={styles.addToCartButton}>
+              <ShoppingBag size={20} color="#fff" />
+              <Text style={styles.addToCartText}>Add to Cart</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.buyNowButton}>
+              <Text style={styles.buyNowText}>Buy Now</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.giftButton}>
+              <Heart size={20} color="#1DB954" />
+              <Text style={styles.giftText}>Gift to Someone</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </Modal>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -1048,6 +1421,7 @@ export default function MusicScreen() {
 
       {renderVideoPlayer()}
       {renderRegionModal()}
+      {renderCheckoutModal()}
       <MusicPlayer />
     </View>
   );
@@ -1232,15 +1606,17 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   youtubeVideoItem: {
-    marginBottom: 16,
+    marginBottom: 24,
+    paddingHorizontal: 20,
+    width: '100%',
   },
   youtubeVideoThumbnailContainer: {
     position: 'relative',
     width: '100%',
-    height: 200,
+    height: 400,
     borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 12,
+    marginBottom: 0,
   },
   youtubeVideoThumbnail: {
     width: '100%',
@@ -1306,17 +1682,18 @@ const styles = StyleSheet.create({
   youtubeVideoContent: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    gap: 16,
   },
   youtubeVideoInfo: {
     flex: 1,
-    paddingRight: 12,
+    paddingTop: 4,
   },
   youtubeVideoTitle: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: 18,
+    fontWeight: 'bold',
     color: '#fff',
-    lineHeight: 22,
-    marginBottom: 4,
+    lineHeight: 24,
+    marginBottom: 8,
   },
   youtubeVideoMeta: {
     gap: 2,
@@ -1345,14 +1722,39 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   youtubeVideoStats: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#AAAAAA',
-    marginBottom: 2,
+    marginBottom: 8,
+    fontWeight: '500',
   },
   youtubeTaggedItemsCount: {
     fontSize: 12,
     color: '#FF6B35',
     fontWeight: '500',
+  },
+  // AI Features
+  aiFeaturesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+  },
+  aiFeatureBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1DB954',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  aiFeatureIcon: {
+    fontSize: 12,
+  },
+  aiFeatureText: {
+    fontSize: 11,
+    color: '#fff',
+    fontWeight: '600',
   },
   youtubeMoreButton: {
     padding: 4,
@@ -1373,6 +1775,7 @@ const styles = StyleSheet.create({
   youtubeMainContent: {
     flex: 1,
     backgroundColor: '#0F0F0F',
+    width: '100%',
   },
   youtubeSidebarHeader: {
     flexDirection: 'row',
@@ -1390,7 +1793,7 @@ const styles = StyleSheet.create({
   youtubeLogo: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FF0000',
+    color: '#1DB954',
   },
   menuButton: {
     padding: 4,
@@ -1799,6 +2202,7 @@ const styles = StyleSheet.create({
   videoPlayerContainer: {
     flex: 1,
     backgroundColor: '#000',
+    paddingBottom: 100,
   },
   videoPlayerWrapper: {
     height: height * 0.4,
@@ -1912,9 +2316,9 @@ const styles = StyleSheet.create({
   },
   // Tagged Items Section
   taggedItemsSection: {
-    flex: 1,
     backgroundColor: '#121212',
     padding: 20,
+    minHeight: 300,
   },
   taggedItemsHeader: {
     flexDirection: 'row',
@@ -1929,6 +2333,7 @@ const styles = StyleSheet.create({
   },
   taggedItemsScroll: {
     marginBottom: 20,
+    height: 200,
   },
   taggedItemCard: {
     backgroundColor: '#282828',
@@ -2093,5 +2498,402 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#fff',
     marginLeft: 12,
+  },
+  // AI Analysis Section
+  aiAnalysisSection: {
+    backgroundColor: '#121212',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+    marginBottom: 0,
+  },
+  aiAnalysisHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  aiAnalysisTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginLeft: 8,
+  },
+  aiAnalysisContent: {
+    gap: 12,
+  },
+  aiAnalysisCard: {
+    backgroundColor: '#282828',
+    borderRadius: 8,
+    padding: 12,
+  },
+  aiAnalysisLabel: {
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 4,
+  },
+  aiAnalysisValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1DB954',
+  },
+  aiRecommendationBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: '#1DB954',
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  aiRecommendationText: {
+    fontSize: 8,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  aiAnalysisItem: {
+    backgroundColor: 'rgba(29, 185, 84, 0.1)',
+    borderRadius: 6,
+    padding: 6,
+    marginBottom: 8,
+  },
+  aiAnalysisItemText: {
+    fontSize: 11,
+    color: '#1DB954',
+    fontStyle: 'italic',
+  },
+  // Comments Section
+  commentsSection: {
+    backgroundColor: '#121212',
+    padding: 20,
+  },
+  commentsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  commentsTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginLeft: 8,
+  },
+  commentsList: {
+    maxHeight: 300,
+  },
+  commentItem: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  commentAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#1DB954',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  commentAvatarText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  commentContent: {
+    flex: 1,
+  },
+  commentHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  commentAuthor: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+    marginRight: 8,
+  },
+  commentTime: {
+    fontSize: 12,
+    color: '#666',
+  },
+  commentText: {
+    fontSize: 14,
+    color: '#fff',
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  commentActions: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  commentAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  commentActionText: {
+    fontSize: 12,
+    color: '#666',
+  },
+  addCommentSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+  },
+  commentInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 12,
+  },
+  commentInput: {
+    flex: 1,
+    backgroundColor: '#282828',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    color: '#fff',
+    fontSize: 14,
+    maxHeight: 100,
+  },
+  commentSendButton: {
+    padding: 8,
+  },
+  checkoutContainer: {
+    flex: 1,
+    backgroundColor: '#121212',
+    padding: 20,
+  },
+  checkoutHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  closeCheckoutButton: {
+    padding: 10,
+  },
+  checkoutTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  placeholder: {
+    width: 40,
+    height: 20,
+  },
+  productImageContainer: {
+    position: 'relative',
+    marginBottom: 20,
+  },
+  productImage: {
+    width: '100%',
+    height: 800,
+    borderRadius: 10,
+  },
+  productInfoSection: {
+    marginBottom: 20,
+  },
+  productBrand: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  productName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  productDescription: {
+    fontSize: 14,
+    color: '#999',
+    marginBottom: 16,
+  },
+  productRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  purchaseStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  purchaseStatsText: {
+    fontSize: 14,
+    color: '#fff',
+    fontWeight: '500',
+  },
+  pricingSection: {
+    marginBottom: 20,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  currentPrice: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  originalPrice: {
+    fontSize: 16,
+    color: '#666',
+    textDecorationLine: 'line-through',
+  },
+  discountBadge: {
+    backgroundColor: '#FF6B35',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  discountText: {
+    fontSize: 12,
+    color: '#fff',
+    fontWeight: '600',
+  },
+  exclusiveSection: {
+    marginBottom: 20,
+  },
+  exclusiveTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  exclusiveCard: {
+    backgroundColor: '#282828',
+    borderRadius: 8,
+    padding: 12,
+    marginRight: 16,
+    width: 150,
+  },
+  exclusiveName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  exclusiveDiscount: {
+    fontSize: 12,
+    color: '#FF6B35',
+    fontWeight: '500',
+  },
+  exclusivePricing: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  exclusiveNewPrice: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  exclusiveOriginalPrice: {
+    fontSize: 12,
+    color: '#666',
+    textDecorationLine: 'line-through',
+  },
+  reviewsSection: {
+    marginBottom: 20,
+  },
+  reviewsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  reviewsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  reviewsCount: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  reviewItem: {
+    marginBottom: 12,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  reviewUser: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+    marginRight: 8,
+  },
+  reviewRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  reviewDate: {
+    fontSize: 12,
+    color: '#666',
+  },
+  reviewComment: {
+    fontSize: 14,
+    color: '#fff',
+    lineHeight: 20,
+  },
+  checkoutActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  addToCartButton: {
+    backgroundColor: '#FF6B35',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 24,
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  addToCartText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  buyNowButton: {
+    backgroundColor: '#1DB954',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 24,
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  buyNowText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  giftButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 24,
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  giftText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1DB954',
   },
 });
