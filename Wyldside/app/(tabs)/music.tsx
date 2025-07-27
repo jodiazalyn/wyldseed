@@ -1149,7 +1149,7 @@ export default function MusicScreen() {
           activeOpacity={1}
         />
       )}
-      <View style={[styles.youtubeMainContent, !sidebarVisible && styles.youtubeMainContentExpanded]}>
+      <View style={[styles.youtubeMainContent, !sidebarVisible && styles.youtubeMainContentExpanded, { margin: 0, padding: 0 }]}>
         <View style={styles.youtubeMainHeader}>
           <TouchableOpacity 
             style={styles.sidebarToggleButton}
@@ -1160,13 +1160,15 @@ export default function MusicScreen() {
           <Text style={styles.youtubeMainTitle}>Videos</Text>
           <View style={styles.placeholder} />
         </View>
-        {renderVideoFilters()}
+        <View style={{ marginHorizontal: 0, paddingHorizontal: 0 }}>
+          {renderVideoFilters()}
+        </View>
         
-        <View style={styles.youtubeVideosList}>
+        <View style={[styles.youtubeVideosList, { marginHorizontal: 0, paddingHorizontal: 0 }]}>
           {musicVideos.map((video) => (
             <TouchableOpacity 
               key={video.id} 
-              style={styles.youtubeVideoItem}
+              style={[styles.youtubeVideoItem, { paddingHorizontal: 0 }]}
               onPress={() => setSelectedVideo(video)}
             >
               <View style={styles.youtubeVideoThumbnailContainer}>
@@ -1437,7 +1439,7 @@ export default function MusicScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={activeTab === 'videos' ? { flex: 1, paddingHorizontal: 0 } : styles.content} showsVerticalScrollIndicator={false}>
         {activeTab === 'music' ? renderMusicContent() : renderVideoContent()}
       </ScrollView>
 
@@ -1531,7 +1533,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: width < 768 ? 20 : 0,
   },
   section: {
     marginBottom: 32,
@@ -1595,7 +1597,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     backgroundColor: '#0F0F0F',
     marginHorizontal: -20,
-    paddingHorizontal: 20,
+    paddingHorizontal: width < 768 ? 20 : 0,
   },
   videoFiltersScroll: {
     paddingVertical: 8,
@@ -1624,18 +1626,18 @@ const styles = StyleSheet.create({
   youtubeVideosList: {
     backgroundColor: '#0F0F0F',
     marginHorizontal: -20,
-    paddingHorizontal: 20,
+    paddingHorizontal: width < 768 ? 20 : 0,
     paddingBottom: 100,
   },
   youtubeVideoItem: {
     marginBottom: 24,
-    paddingHorizontal: 20,
+    paddingHorizontal: width < 768 ? 20 : 0,
     width: '100%',
   },
   youtubeVideoThumbnailContainer: {
     position: 'relative',
     width: '100%',
-    height: 400,
+    height: width < 768 ? 400 : 500,
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 0,
@@ -1704,7 +1706,7 @@ const styles = StyleSheet.create({
   youtubeVideoContent: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 16,
+    gap: width < 768 ? 16 : 12,
   },
   youtubeVideoInfo: {
     flex: 1,
@@ -1796,6 +1798,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0F0F0F',
     width: '100%',
+    paddingLeft: width < 768 ? 0 : 0,
   },
   youtubeSidebarHeader: {
     flexDirection: 'row',
@@ -2918,12 +2921,13 @@ const styles = StyleSheet.create({
   },
   youtubeMainContentExpanded: {
     flex: 1,
+    marginLeft: width < 768 ? 0 : 0,
   },
   youtubeMainHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: width < 768 ? 16 : 4,
     borderBottomWidth: 1,
     borderBottomColor: '#444',
   },
@@ -2936,7 +2940,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   youtubeSidebarContainer: {
-    width: width < 768 ? 280 : 240,
+    width: width < 768 ? 280 : 220,
     backgroundColor: '#0F0F0F',
     borderRightWidth: 1,
     borderRightColor: '#272727',
