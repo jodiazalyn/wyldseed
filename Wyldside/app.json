@@ -1,11 +1,12 @@
 {
   "expo": {
-    "name": "bolt-expo-nativewind",
-    "slug": "bolt-expo-nativewind",
+    "name": "Wyldseed",
+    "slug": "wyldseed",
+    "description": "Discover music, connect socially, and explore culture through AI-powered recommendations and immersive experiences.",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "wyldseed",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
