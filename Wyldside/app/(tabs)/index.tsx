@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, Dimensions, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Play, Plus, Heart, Globe, ChevronDown, Check, Volume2, VolumeX } from 'lucide-react-native';
 import { MusicPlayer } from '@/components/MusicPlayer';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const { width, height } = Dimensions.get('window');
 
@@ -13,6 +13,78 @@ export default function HomeScreen() {
   const [showCountryModal, setShowCountryModal] = useState(false);
   const [activeCultureVideo, setActiveCultureVideo] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
+  
+  // Animation values for each tile
+  const tileAnimations = useRef(
+    Array.from({ length: 4 }, () => ({
+      scale: new Animated.Value(1),
+      opacity: new Animated.Value(1),
+      translateY: new Animated.Value(0),
+    }))
+  ).current;
+
+  // Floating animation effect for tiles
+  useEffect(() => {
+    const animations = tileAnimations.map((anim, index) => {
+      return Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim.translateY, {
+            toValue: -5 + (index % 2) * 10,
+            duration: 2000 + index * 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(anim.translateY, {
+            toValue: 5 - (index % 2) * 10,
+            duration: 2000 + index * 200,
+            useNativeDriver: true,
+          }),
+        ]),
+        { iterations: -1 }
+      );
+    });
+
+    animations.forEach(animation => animation.start());
+
+    return () => {
+      animations.forEach(animation => animation.stop());
+    };
+  }, []);
+
+  const handleTilePress = (tileIndex: number) => {
+    const anim = tileAnimations[tileIndex];
+    
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(anim.scale, {
+          toValue: 0.95,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(anim.opacity, {
+          toValue: 0.8,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.parallel([
+        Animated.timing(anim.scale, {
+          toValue: 1.05,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(anim.opacity, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.timing(anim.scale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
   const countries = [
     { code: 'US', name: 'United States', flag: '🇺🇸', currency: '$' },
@@ -28,6 +100,14 @@ export default function HomeScreen() {
   ];
 
   const currentCountry = countries.find(c => c.code === selectedCountry) || countries[0];
+
+  // Featured music tile
+  const featuredMusicTile = {
+    id: 'music',
+    title: 'Music',
+    image: 'https://media.giphy.com/media/l0HlQ7LRalQqdWfao/giphy.gif', // Animated music visualizer GIF
+    color: '#8B5CF6',
+  };
 
   // Spotify-style browse tiles
   const browseTiles = [
@@ -412,7 +492,7 @@ export default function HomeScreen() {
       ]
     };
 
-    return videosByCountry[selectedCountry] || videosByCountry.US;
+    return videosByCountry[selectedCountry as keyof typeof videosByCountry] || videosByCountry.US;
   };
 
   // Content varies by country
@@ -860,7 +940,7 @@ export default function HomeScreen() {
       }
     };
 
-    return contentByCountry[selectedCountry] || contentByCountry.US;
+    return contentByCountry[selectedCountry as keyof typeof contentByCountry] || contentByCountry.US;
   };
 
   const content = getLocalizedContent();
@@ -1042,14 +1122,50 @@ export default function HomeScreen() {
       </LinearGradient>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Music Tile */}
+        <View style={styles.section}>
+          <TouchableOpacity 
+            style={[styles.featuredMusicTile, { backgroundColor: featuredMusicTile.color }]}
+            onPress={() => router.push('/(tabs)/music')}
+            activeOpacity={0.8}
+          >
+            <Image source={{ uri: featuredMusicTile.image }} style={styles.featuredMusicBackground} />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
+              style={styles.featuredMusicGradient}
+            />
+            <View style={styles.featuredMusicContent}>
+              <Text style={styles.featuredMusicTitle}>{featuredMusicTile.title}</Text>
+              <TouchableOpacity style={styles.featuredPlayButton}>
+                <Play size={28} color="#fff" fill="#fff" />
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </View>
+
         {/* Spotify-style Browse Tiles */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Start browsing</Text>
           <View style={styles.browseTilesGrid}>
-            {browseTiles.map((tile) => (
-              <TouchableOpacity key={tile.id} style={[styles.browseTile, { backgroundColor: tile.color }]}>
-                <Text style={styles.browseTileTitle}>{tile.title}</Text>
-                <Image source={{ uri: tile.image }} style={styles.browseTileImage} />
+            {browseTiles.map((tile, index) => (
+              <TouchableOpacity
+                key={tile.id}
+                style={[styles.browseTile, { backgroundColor: tile.color }]}
+                onPress={() => {
+                  handleTilePress(index);
+                  // Navigate to a specific tile detail page if needed
+                  // router.push(`/browse/${tile.id}`);
+                }}
+                activeOpacity={0.8}
+              >
+                <Image source={{ uri: tile.image }} style={styles.browseTileBackgroundImage} />
+                <LinearGradient
+                  colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
+                  style={styles.browseTileGradient}
+                />
+                <View style={styles.browseTileContent}>
+                  <Text style={styles.browseTileTitle}>{tile.title}</Text>
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -1278,28 +1394,51 @@ const styles = StyleSheet.create({
   },
   browseTile: {
     width: '48%',
-    height: 100,
-    borderRadius: 8,
-    padding: 16,
+    height: 120,
+    borderRadius: 16,
     position: 'relative',
     overflow: 'hidden',
-    justifyContent: 'flex-start',
+    marginBottom: 8,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  browseTileBackgroundImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  browseTileGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  browseTileContent: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    justifyContent: 'flex-end',
   },
   browseTileTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
-    zIndex: 2,
-  },
-  browseTileImage: {
-    position: 'absolute',
-    bottom: -10,
-    right: -10,
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    transform: [{ rotate: '25deg' }],
-    opacity: 0.8,
+    textShadowColor: 'rgba(0, 0, 0, 0.7)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   featuredCard: {
     flexDirection: 'row',
@@ -1613,5 +1752,65 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
     lineHeight: 20,
+  },
+  // Featured Music Tile Styles
+  featuredMusicTile: {
+    height: 140,
+    borderRadius: 20,
+    overflow: 'hidden',
+    position: 'relative',
+    marginBottom: 20,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  featuredMusicBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  featuredMusicGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  featuredMusicContent: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 20,
+  },
+  featuredMusicTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  featuredPlayButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
 });

@@ -34,12 +34,48 @@ export default function SocialFeedScreen() {
   const currentRegion = regions.find(r => r.code === selectedRegion) || regions[0];
 
   const filters = [
-    { id: 'all', name: 'All', icon: Users },
-    { id: 'trending', name: 'Trending', icon: TrendingUp },
-    { id: 'polls', name: 'Polls', icon: ThumbsUp },
-    { id: 'debates', name: 'Debates', icon: MessageCircle },
-    { id: 'sports', name: 'Sports', icon: Trophy },
-    { id: 'nearby', name: 'Nearby', icon: MapPin },
+    { 
+      id: 'all', 
+      name: 'All', 
+      icon: Users, 
+      colors: ['#8B5CF6', '#A855F7'],
+      backgroundColor: '#8B5CF6'
+    },
+    { 
+      id: 'trending', 
+      name: 'Trending', 
+      icon: TrendingUp, 
+      colors: ['#F59E0B', '#F97316'],
+      backgroundColor: '#F59E0B'
+    },
+    { 
+      id: 'polls', 
+      name: 'Polls', 
+      icon: ThumbsUp, 
+      colors: ['#10B981', '#059669'],
+      backgroundColor: '#10B981'
+    },
+    { 
+      id: 'debates', 
+      name: 'Debates', 
+      icon: MessageCircle, 
+      colors: ['#EF4444', '#DC2626'],
+      backgroundColor: '#EF4444'
+    },
+    { 
+      id: 'sports', 
+      name: 'Sports', 
+      icon: Trophy, 
+      colors: ['#3B82F6', '#2563EB'],
+      backgroundColor: '#3B82F6'
+    },
+    { 
+      id: 'nearby', 
+      name: 'Nearby', 
+      icon: MapPin, 
+      colors: ['#EC4899', '#DB2777'],
+      backgroundColor: '#EC4899'
+    },
   ];
 
   const postTypes = [
@@ -50,15 +86,87 @@ export default function SocialFeedScreen() {
     { id: 'debate', name: 'Debate', icon: Trophy, color: '#8B5CF6' },
   ];
 
+  const [following, setFollowing] = useState<number[]>([2]); // IDs of users being followed
+  const [showComments, setShowComments] = useState<number | null>(null);
+  const [newComment, setNewComment] = useState('');
+  
+  // Instagram-style Stories
+  const stories = [
+    {
+      id: 1,
+      user: {
+        name: 'You',
+        username: '@you',
+        avatar: 'https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg',
+      },
+      hasStory: false,
+      isYour: true,
+    },
+    {
+      id: 2,
+      user: {
+        name: 'Alex Chen',
+        username: '@alexc_style',
+        avatar: 'https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg',
+      },
+      hasStory: true,
+      isYour: false,
+    },
+    {
+      id: 3,
+      user: {
+        name: 'DJ Pulse',
+        username: '@djpulse_official',
+        avatar: 'https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg',
+      },
+      hasStory: true,
+      isYour: false,
+    },
+    {
+      id: 4,
+      user: {
+        name: 'Sophia',
+        username: '@luxury_life',
+        avatar: 'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg',
+      },
+      hasStory: true,
+      isYour: false,
+    },
+  ];
+
+  // Suggested users to follow
+  const suggestedUsers = [
+    {
+      id: 5,
+      name: 'Fashion Nova',
+      username: '@fashion_nova',
+      avatar: 'https://images.pexels.com/photos/1697214/pexels-photo-1697214.jpeg',
+      verified: true,
+      followers: '2.1M',
+      mutualFollowers: 3,
+    },
+    {
+      id: 6,
+      name: 'Street Culture',
+      username: '@street_culture',
+      avatar: 'https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg',
+      verified: false,
+      followers: '156K',
+      mutualFollowers: 7,
+    },
+  ];
+
   const [posts, setPosts] = useState([
     {
       id: 1,
       type: 'poll',
       user: {
+        id: 1,
         name: 'Alex Chen',
         username: '@alexc_style',
         avatar: 'https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg',
         verified: true,
+        followers: '89.2K',
       },
       content: 'Which fit goes harder? 🔥',
       location: 'Brooklyn, NY',
@@ -74,7 +182,7 @@ export default function SocialFeedScreen() {
           { id: 2, text: 'Yeezys + Tracksuit', votes: 623, image: 'https://images.pexels.com/photos/1464625/pexels-photo-1464625.jpeg' }
         ],
         totalVotes: 1470,
-        userVoted: null,
+        userVoted: 1,
       },
       tags: ['#streetwear', '#fashion', '#brooklyn'],
     },
@@ -82,10 +190,12 @@ export default function SocialFeedScreen() {
       id: 2,
       type: 'debate',
       user: {
+        id: 2,
         name: 'Marcus Johnson',
         username: '@hoops_king',
         avatar: 'https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg',
         verified: false,
+        followers: '245K',
       },
       content: 'LeBron vs MJ debate will never end, but who had the better sneaker game? 👑',
       location: 'Los Angeles, CA',
@@ -108,10 +218,12 @@ export default function SocialFeedScreen() {
       id: 3,
       type: 'photo',
       user: {
+        id: 3,
         name: 'Sophia Martinez',
         username: '@luxury_life',
         avatar: 'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg',
         verified: true,
+        followers: '1.2M',
       },
       content: 'New McLaren just dropped 🏎️💨 The sound is unreal!',
       location: 'Miami, FL',
@@ -130,10 +242,12 @@ export default function SocialFeedScreen() {
       id: 4,
       type: 'video',
       user: {
+        id: 4,
         name: 'DJ Pulse',
         username: '@djpulse_official',
         avatar: 'https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg',
         verified: true,
+        followers: '567K',
       },
       content: 'Studio session vibes 🎵 New track dropping soon!',
       location: 'Atlanta, GA',
@@ -153,10 +267,12 @@ export default function SocialFeedScreen() {
       id: 5,
       type: 'poll',
       user: {
+        id: 5,
         name: 'Fashion Forward',
         username: '@fashion_fwd',
         avatar: 'https://images.pexels.com/photos/1697214/pexels-photo-1697214.jpeg',
         verified: false,
+        followers: '78K',
       },
       content: 'Rate this Gucci x Adidas collab 👕',
       location: 'Paris, France',
@@ -178,6 +294,22 @@ export default function SocialFeedScreen() {
       tags: ['#gucci', '#adidas', '#collab'],
     },
   ]);
+
+  // Instagram-inspired Follow functionality
+  const handleFollow = (userId: number) => {
+    setFollowing(prev => 
+      prev.includes(userId) 
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  const handleComment = (postId: number) => {
+    if (!newComment.trim()) return;
+    Alert.alert('Comment Added', 'Your comment has been posted!');
+    setNewComment('');
+    setShowComments(null);
+  };
 
   const handleLike = (postId: number) => {
     setPosts(posts.map(post => 
@@ -241,10 +373,12 @@ export default function SocialFeedScreen() {
       id: posts.length + 1,
       type: postType,
       user: {
+        id: 0,
         name: 'You',
         username: '@you',
         avatar: 'https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg',
         verified: false,
+        followers: '0',
       },
       content: newPostText,
       location: selectedLocation || 'Your Location',
@@ -437,6 +571,170 @@ export default function SocialFeedScreen() {
     </Modal>
   );
 
+  // Mock comments data for each post
+  const getCommentsForPost = (postId: number) => {
+    const commentsData = {
+      1: [
+        {
+          id: 1,
+          user: { name: 'Sarah K', username: '@sarah_style', avatar: 'https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg' },
+          text: 'Those Jordan 1s are straight fire! 🔥',
+          time: '2h ago',
+          likes: 12
+        },
+        {
+          id: 2,
+          user: { name: 'Mike Chen', username: '@mike_fashion', avatar: 'https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg' },
+          text: 'Tracksuit gang all day! Yeezys hit different 💯',
+          time: '1h ago',
+          likes: 8
+        },
+        {
+          id: 3,
+          user: { name: 'Style Queen', username: '@style_queen', avatar: 'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg' },
+          text: 'Both fits are clean but that hoodie combo is unmatched',
+          time: '45m ago',
+          likes: 5
+        }
+      ],
+      2: [
+        {
+          id: 1,
+          user: { name: 'Basketball Fan', username: '@hoops_life', avatar: 'https://images.pexels.com/photos/1697214/pexels-photo-1697214.jpeg' },
+          text: 'MJ all day! Those Chicago 1s changed the game forever',
+          time: '3h ago',
+          likes: 23
+        },
+        {
+          id: 2,
+          user: { name: 'Sneaker Head', username: '@kicks_daily', avatar: 'https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg' },
+          text: 'LeBron got variety but MJ got that timeless style 👑',
+          time: '2h ago',
+          likes: 18
+        }
+      ],
+      3: [
+        {
+          id: 1,
+          user: { name: 'Car Enthusiast', username: '@speed_demon', avatar: 'https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg' },
+          text: 'That McLaren sound is pure music! 🎵',
+          time: '4h ago',
+          likes: 31
+        },
+        {
+          id: 2,
+          user: { name: 'Luxury Lover', username: '@luxury_life', avatar: 'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg' },
+          text: 'Miami vibes with that beauty! Where did you see it?',
+          time: '3h ago',
+          likes: 15
+        }
+      ],
+      4: [
+        {
+          id: 1,
+          user: { name: 'Music Producer', username: '@beats_maker', avatar: 'https://images.pexels.com/photos/1697214/pexels-photo-1697214.jpeg' },
+          text: 'Studio sessions always hit different! 🔥🎵',
+          time: '6h ago',
+          likes: 42
+        }
+      ],
+      5: [
+        {
+          id: 1,
+          user: { name: 'Fashion Critic', username: '@fashion_review', avatar: 'https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg' },
+          text: 'Gucci x Adidas is bold but not sure it works...',
+          time: '10h ago',
+          likes: 7
+        }
+      ]
+    };
+    return commentsData[postId as keyof typeof commentsData] || [];
+  };
+
+  const renderCommentsModal = () => {
+    const currentPost = posts.find(p => p.id === showComments);
+    const comments = showComments ? getCommentsForPost(showComments) : [];
+    
+    return (
+      <Modal
+        visible={showComments !== null}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowComments(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.commentsModal}>
+            <View style={styles.commentsHeader}>
+              <TouchableOpacity onPress={() => setShowComments(null)}>
+                <X size={24} color="#fff" />
+              </TouchableOpacity>
+              <Text style={styles.commentsTitle}>Comments</Text>
+              <Text style={styles.commentsCount}>{comments.length}</Text>
+            </View>
+
+            <ScrollView style={styles.commentsList} showsVerticalScrollIndicator={false}>
+              {currentPost && (
+                <View style={styles.originalPost}>
+                  <View style={styles.originalPostHeader}>
+                    <Image source={{ uri: currentPost.user.avatar }} style={styles.commentAvatar} />
+                    <View style={styles.originalPostInfo}>
+                      <Text style={styles.originalPostUser}>{currentPost.user.name}</Text>
+                      <Text style={styles.originalPostText}>{currentPost.content}</Text>
+                    </View>
+                  </View>
+                </View>
+              )}
+              
+              {comments.map((comment) => (
+                <View key={comment.id} style={styles.commentItem}>
+                  <Image source={{ uri: comment.user.avatar }} style={styles.commentAvatar} />
+                  <View style={styles.commentContent}>
+                    <View style={styles.commentHeader}>
+                      <Text style={styles.commentUser}>{comment.user.username}</Text>
+                      <Text style={styles.commentTime}>{comment.time}</Text>
+                    </View>
+                    <Text style={styles.commentText}>{comment.text}</Text>
+                    <View style={styles.commentActions}>
+                      <TouchableOpacity style={styles.commentLike}>
+                        <Heart size={14} color="#999" />
+                        <Text style={styles.commentLikeCount}>{comment.likes}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity>
+                        <Text style={styles.commentReply}>Reply</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+
+            <View style={styles.commentInputContainer}>
+              <Image 
+                source={{ uri: 'https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg' }} 
+                style={styles.commentInputAvatar} 
+              />
+              <TextInput
+                style={styles.commentInput}
+                placeholder="Add a comment..."
+                placeholderTextColor="#999"
+                value={newComment}
+                onChangeText={setNewComment}
+                multiline
+              />
+              <TouchableOpacity 
+                style={[styles.sendButton, !newComment.trim() && styles.sendButtonDisabled]}
+                onPress={() => handleComment(showComments!)}
+                disabled={!newComment.trim()}
+              >
+                <Send size={20} color={!newComment.trim() ? "#666" : "#8B5CF6"} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
   const renderPost = (post: any) => (
     <View key={post.id} style={styles.postCard}>
       <View style={styles.postHeader}>
@@ -581,7 +879,10 @@ export default function SocialFeedScreen() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => setShowComments(post.id)}
+        >
           <MessageCircle size={20} color="#999" />
           <Text style={styles.actionText}>{post.comments}</Text>
         </TouchableOpacity>
@@ -636,25 +937,34 @@ export default function SocialFeedScreen() {
       </View>
 
       <View style={styles.filtersContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.appIconsContainer}>
           {filters.map((filter) => {
             const IconComponent = filter.icon;
+            const isActive = activeFilter === filter.id;
             return (
               <TouchableOpacity
                 key={filter.id}
-                style={[
-                  styles.filterButton,
-                  activeFilter === filter.id && styles.activeFilterButton
-                ]}
+                style={styles.appIconWrapper}
                 onPress={() => setActiveFilter(filter.id)}
+                activeOpacity={0.7}
               >
-                <IconComponent 
-                  size={16} 
-                  color={activeFilter === filter.id ? "#fff" : "#999"} 
-                />
+                <LinearGradient
+                  colors={isActive ? ['#fff', '#f0f0f0'] : filter.colors as [string, string]}
+                  style={[
+                    styles.appIcon,
+                    isActive && styles.activeAppIcon
+                  ]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <IconComponent 
+                    size={20} 
+                    color={isActive ? filter.backgroundColor : "#fff"} 
+                  />
+                </LinearGradient>
                 <Text style={[
-                  styles.filterText,
-                  activeFilter === filter.id && styles.activeFilterText
+                  styles.appIconLabel,
+                  isActive && styles.activeAppIconLabel
                 ]}>
                   {filter.name}
                 </Text>
@@ -669,6 +979,7 @@ export default function SocialFeedScreen() {
       </ScrollView>
 
       {renderCreatePostModal()}
+      {renderCommentsModal()}
       {renderRegionModal()}
       <MusicPlayer />
     </View>
@@ -1197,5 +1508,188 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#fff',
     marginLeft: 12,
+  },
+  // Comments Modal Styles
+  commentsModal: {
+    backgroundColor: '#2a2a2a',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    height: height * 0.8,
+  },
+  commentsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  commentsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  commentsCount: {
+    fontSize: 14,
+    color: '#8B5CF6',
+    fontWeight: '600',
+  },
+  commentsList: {
+    flex: 1,
+    padding: 20,
+  },
+  originalPost: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    borderLeftWidth: 3,
+    borderLeftColor: '#8B5CF6',
+  },
+  originalPostHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  originalPostInfo: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  originalPostUser: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  originalPostText: {
+    fontSize: 14,
+    color: '#ccc',
+    lineHeight: 18,
+  },
+  commentItem: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    alignItems: 'flex-start',
+  },
+  commentAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginRight: 12,
+  },
+  commentContent: {
+    flex: 1,
+  },
+  commentHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  commentUser: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8B5CF6',
+  },
+  commentTime: {
+    fontSize: 12,
+    color: '#666',
+  },
+  commentText: {
+    fontSize: 14,
+    color: '#fff',
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  commentActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  commentLike: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  commentLikeCount: {
+    fontSize: 12,
+    color: '#999',
+  },
+  commentReply: {
+    fontSize: 12,
+    color: '#8B5CF6',
+    fontWeight: '600',
+  },
+  commentInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+    gap: 12,
+  },
+  commentInputAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+  },
+  commentInput: {
+    flex: 1,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#fff',
+    maxHeight: 80,
+  },
+  sendButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sendButtonDisabled: {
+    backgroundColor: '#222',
+  },
+  // App Icon Styles
+  appIconsContainer: {
+    paddingHorizontal: 12,
+  },
+  appIconWrapper: {
+    alignItems: 'center',
+    marginHorizontal: 8,
+    marginVertical: 8,
+  },
+  appIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  activeAppIcon: {
+    elevation: 6,
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    borderWidth: 2,
+    borderColor: '#8B5CF6',
+  },
+  appIconLabel: {
+    fontSize: 11,
+    color: '#999',
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  activeAppIconLabel: {
+    color: '#8B5CF6',
+    fontWeight: '600',
   },
 });

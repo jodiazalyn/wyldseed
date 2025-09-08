@@ -862,10 +862,14 @@ export default function MusicScreen() {
           {categoryTiles.map((category) => (
             <TouchableOpacity 
               key={category.id} 
-              style={[styles.categoryTile, { backgroundColor: category.color }]}
+              style={styles.categoryTile}
             >
+              <Image source={{ uri: category.image }} style={styles.categoryBackgroundImage} />
+              <LinearGradient
+                colors={[`${category.color}80`, `${category.color}CC`]}
+                style={styles.categoryGradient}
+              />
               <Text style={styles.categoryTitle}>{category.title}</Text>
-              <Image source={{ uri: category.image }} style={styles.categoryImage} />
             </TouchableOpacity>
           ))}
         </View>
@@ -1865,27 +1869,46 @@ const styles = StyleSheet.create({
     width: '48%',
     height: 100,
     borderRadius: 8,
-    padding: 16,
     position: 'relative',
     overflow: 'hidden',
     justifyContent: 'flex-start',
     marginBottom: 8,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  categoryBackgroundImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  categoryGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
   },
   categoryTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
-    zIndex: 2,
-  },
-  categoryImage: {
+    zIndex: 3,
     position: 'absolute',
-    bottom: -10,
-    right: -10,
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    transform: [{ rotate: '25deg' }],
-    opacity: 0.8,
+    bottom: 16,
+    left: 16,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   // NFL Jersey Ad
   adContainer: {
