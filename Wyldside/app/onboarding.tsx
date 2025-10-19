@@ -123,15 +123,15 @@ export default function OnboardingScreen() {
 
   const handleComplete = async () => {
     try {
-      // Save onboarding data and create AI agent
+      // Save onboarding data and create personalized profile
       console.log('Onboarding completed with data:', onboardingData);
       
       // Save onboarding data to AsyncStorage
       await AsyncStorage.setItem('onboardingData', JSON.stringify(onboardingData));
       await AsyncStorage.setItem('hasCompletedOnboarding', 'true');
       
-      // TODO: Send to API to create personalized AI agent
-      // const response = await fetch('YOUR_API_ENDPOINT/create-agent', {
+      // TODO: Send to API to create personalized algorithm profile
+      // const response = await fetch('YOUR_API_ENDPOINT/create-profile', {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify(onboardingData),
@@ -188,10 +188,10 @@ export default function OnboardingScreen() {
             </View>
             <Text style={styles.welcomeTitle}>Welcome to Wyldseed</Text>
             <Text style={styles.welcomeSubtitle}>
-              Your AI-Powered Hip Hop Culture Experience
+              The World's Only Global Hip Hop Experience
             </Text>
             <Text style={styles.description}>
-              We're about to create a personalized journey just for you. Our AI will learn your
+              We're about to create a personalized journey just for you. Our machine learning algorithms will adapt to your
               preferences and curate everything from music to fashion, videos to cultural trends.
             </Text>
             <View style={styles.featureList}>
