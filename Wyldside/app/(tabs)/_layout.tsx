@@ -1,24 +1,29 @@
 import React, { useState } from 'react';
 import { Tabs } from 'expo-router';
-import { Chrome as Home, Music, ShoppingBag, User, Users, Grid3x3 as Grid3X3, Search } from 'lucide-react-native';
+import { Chrome as Home, Music, ShoppingBag, User, Users, Grid3x3 as Grid3X3, Search, Menu } from 'lucide-react-native';
 import { View, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
+import { useRegion } from '@/hooks/useRegionContext';
 
 const { width, height } = Dimensions.get('window');
 
 const FloatingNavigation = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const { getUIText } = useRegion();
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const uiText = getUIText();
+  
   const navItems = [
-    { name: 'index', title: 'Home', icon: Home, route: '/' },
-    { name: 'music', title: 'Music', icon: Music, route: '/music' },
-    { name: 'categories', title: 'Categories', icon: Grid3X3, route: '/categories' },
-    { name: 'social', title: 'Social', icon: Users, route: '/social' },
-    { name: 'search', title: 'Search', icon: Search, route: '/search' },
-    { name: 'shop', title: 'Shop', icon: ShoppingBag, route: '/shop' },
-    { name: 'profile', title: 'Profile', icon: User, route: '/profile' },
+    { name: 'menu', title: uiText.menu, icon: Menu, route: null }, // Toggle button - no route
+    { name: 'index', title: uiText.home, icon: Home, route: '/' },
+    { name: 'music', title: uiText.music, icon: Music, route: '/music' },
+    { name: 'categories', title: uiText.categories, icon: Grid3X3, route: '/categories' },
+    { name: 'social', title: uiText.social, icon: Users, route: '/social' },
+    { name: 'search', title: uiText.search, icon: Search, route: '/search' },
+    { name: 'shop', title: uiText.shop, icon: ShoppingBag, route: '/shop' },
+    { name: 'profile', title: uiText.profile, icon: User, route: '/profile' },
   ];
 
   const handleNavigation = (route: string) => {
@@ -30,7 +35,7 @@ const FloatingNavigation = () => {
     <View style={styles.floatingNavContainer}>
       {navItems.map((item, index) => {
         const IconComponent = item.icon;
-        const isActive = pathname === item.route || pathname.startsWith(`/${item.name}`);
+        const isActive = item.route && (pathname === item.route || pathname.startsWith(`/${item.name}`));
         
         return (
           <TouchableOpacity
@@ -47,8 +52,10 @@ const FloatingNavigation = () => {
             ]}
             onPress={() => {
               if (index === 0) {
+                // Toggle menu for the first "Menu" button
                 setIsExpanded(!isExpanded);
-              } else {
+              } else if (item.route) {
+                // Navigate for all other items
                 handleNavigation(item.route);
               }
             }}

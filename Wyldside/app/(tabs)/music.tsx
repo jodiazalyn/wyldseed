@@ -3,11 +3,14 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions
 import { Play, Shuffle, MoveVertical as MoreVertical, Video, Music as MusicIcon, X, Heart, Download, Plus, Pause, SkipBack, SkipForward, Volume2, VolumeX, ShoppingBag, Star, Tag, Bell, Cast, Search, Filter, Globe, ChevronDown, Check, MessageCircle, Send, Brain } from 'lucide-react-native';
 import { useState } from 'react';
 import { MusicPlayer } from '@/components/MusicPlayer';
+import { RegionLanguageSelector } from '@/components/RegionLanguageSelector';
+import { useRegion } from '@/hooks/useRegionContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
 export default function MusicScreen() {
+  const { selectedGeography, currentGeography, getUIText } = useRegion();
   const [activeTab, setActiveTab] = useState<'music' | 'videos'>('music');
   const [showAd, setShowAd] = useState(true);
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
@@ -15,37 +18,22 @@ export default function MusicScreen() {
   const [isMuted, setIsMuted] = useState(true);
   const [videoProgress, setVideoProgress] = useState(0.3); // 30% progress for demo
   const [activeVideoFilter, setActiveVideoFilter] = useState('All');
-  const [selectedRegion, setSelectedRegion] = useState('US');
-  const [showRegionModal, setShowRegionModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [showCheckout, setShowCheckout] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
 
-  const regions = [
-    { code: 'US', name: 'United States', flag: '🇺🇸' },
-    { code: 'UK', name: 'United Kingdom', flag: '🇬🇧' },
-    { code: 'CA', name: 'Canada', flag: '🇨🇦' },
-    { code: 'AU', name: 'Australia', flag: '🇦🇺' },
-    { code: 'DE', name: 'Germany', flag: '🇩🇪' },
-    { code: 'FR', name: 'France', flag: '🇫🇷' },
-    { code: 'JP', name: 'Japan', flag: '🇯🇵' },
-    { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
-    { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
-    { code: 'IN', name: 'India', flag: '🇮🇳' },
-  ];
-
-  const currentRegion = regions.find(r => r.code === selectedRegion) || regions[0];
+  const uiText = getUIText();
 
   // YouTube-style video filters
   const videoFilters = [
     'All', 'Music', 'Hip Hop', 'Rap', 'R&B', 'Trap', 'New to you', 'Recently uploaded', 'Watched'
   ];
 
-  // Spotify-style category tiles
+  // Spotify-style category tiles with translated titles
   const categoryTiles = [
     {
       id: 1,
-      title: 'Hip Hop Central',
+      title: uiText.hipHopCentral,
       color: '#E91E63',
       image: 'https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg',
     },
@@ -808,68 +796,21 @@ export default function MusicScreen() {
     );
   };
 
-  const renderRegionModal = () => (
-    <Modal
-      visible={showRegionModal}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={() => setShowRegionModal(false)}
-    >
-      <TouchableOpacity 
-        style={styles.modalOverlay}
-        activeOpacity={1}
-        onPress={() => setShowRegionModal(false)}
-      >
-        <View style={styles.regionModalContent}>
-          <View style={styles.regionModalHeader}>
-            <Text style={styles.regionModalTitle}>Select Region</Text>
-          </View>
-          
-          <ScrollView style={styles.regionList} showsVerticalScrollIndicator={false}>
-            {regions.map((region) => (
-              <TouchableOpacity
-                key={region.code}
-                style={[
-                  styles.regionItem,
-                  selectedRegion === region.code && styles.selectedRegionItem
-                ]}
-                onPress={() => {
-                  setSelectedRegion(region.code);
-                  setShowRegionModal(false);
-                }}
-              >
-                <View style={styles.regionInfo}>
-                  <Text style={styles.regionFlag}>{region.flag}</Text>
-                  <Text style={styles.regionName}>{region.name}</Text>
-                </View>
-                {selectedRegion === region.code && (
-                  <Check size={20} color="#1DB954" />
-                )}
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  );
+  // Region modal removed - now using global RegionLanguageSelector component
 
   const renderMusicContent = () => (
     <>
       {/* Browse Categories */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Browse all</Text>
+        <Text style={styles.sectionTitle}>{uiText.browseCategories}</Text>
         <View style={styles.categoryGrid}>
           {categoryTiles.map((category) => (
             <TouchableOpacity 
               key={category.id} 
-              style={styles.categoryTile}
+              style={[styles.categoryTile, { backgroundColor: category.color }]}
             >
-              <Image source={{ uri: category.image }} style={styles.categoryBackgroundImage} />
-              <LinearGradient
-                colors={[`${category.color}80`, `${category.color}CC`]}
-                style={styles.categoryGradient}
-              />
               <Text style={styles.categoryTitle}>{category.title}</Text>
+              <Image source={{ uri: category.image }} style={styles.categoryImage} />
             </TouchableOpacity>
           ))}
         </View>
@@ -880,7 +821,7 @@ export default function MusicScreen() {
 
       {/* Recently Played */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Recently played</Text>
+        <Text style={styles.sectionTitle}>{uiText.recentlyPlayed}</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {recentlyPlayed.map((item) => (
             <TouchableOpacity key={item.id} style={styles.recentCard}>
@@ -894,7 +835,7 @@ export default function MusicScreen() {
 
       {/* Made for You */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Made for you</Text>
+        <Text style={styles.sectionTitle}>{uiText.madeForYou}</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {playlists.map((playlist) => (
             <TouchableOpacity key={playlist.id} style={styles.playlistCard}>
@@ -1399,19 +1340,11 @@ export default function MusicScreen() {
       {activeTab === 'videos' ? null : (
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.title}>Good evening</Text>
-            <Text style={styles.subtitle}>Discover music from {currentRegion.name}</Text>
+            <Text style={styles.title}>{uiText.goodEvening}</Text>
+            <Text style={styles.subtitle}>{uiText.discoverMusic} {currentGeography.name}</Text>
           </View>
           <View style={styles.headerActions}>
-            <TouchableOpacity 
-              style={styles.regionSelector}
-              onPress={() => setShowRegionModal(true)}
-            >
-              <Globe size={16} color="#fff" />
-              <Text style={styles.regionFlag}>{currentRegion.flag}</Text>
-              <Text style={styles.regionCode}>{currentRegion.code}</Text>
-              <ChevronDown size={14} color="#fff" />
-            </TouchableOpacity>
+            <RegionLanguageSelector />
             <TouchableOpacity style={styles.headerButton}>
               <Download size={24} color="#fff" />
             </TouchableOpacity>
@@ -1448,7 +1381,6 @@ export default function MusicScreen() {
       </ScrollView>
 
       {renderVideoPlayer()}
-      {renderRegionModal()}
       {renderCheckoutModal()}
       <MusicPlayer />
     </View>
@@ -1869,46 +1801,27 @@ const styles = StyleSheet.create({
     width: '48%',
     height: 100,
     borderRadius: 8,
+    padding: 16,
     position: 'relative',
     overflow: 'hidden',
     justifyContent: 'flex-start',
     marginBottom: 8,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  categoryBackgroundImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  categoryGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: '100%',
-    height: '100%',
   },
   categoryTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
-    zIndex: 3,
+    zIndex: 2,
+  },
+  categoryImage: {
     position: 'absolute',
-    bottom: 16,
-    left: 16,
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    bottom: -10,
+    right: -10,
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    transform: [{ rotate: '25deg' }],
+    opacity: 0.8,
   },
   // NFL Jersey Ad
   adContainer: {

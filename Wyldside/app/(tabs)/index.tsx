@@ -1,7 +1,9 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, Dimensions, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Play, Plus, Heart, Globe, ChevronDown, Check, Volume2, VolumeX } from 'lucide-react-native';
+import { Play, Plus, Heart, Volume2, VolumeX, TrendingUp } from 'lucide-react-native';
 import { MusicPlayer } from '@/components/MusicPlayer';
+import { RegionLanguageSelector } from '@/components/RegionLanguageSelector';
+import { useRegion } from '@/hooks/useRegionContext';
 import { useRouter } from 'expo-router';
 import { useState, useEffect, useRef } from 'react';
 
@@ -9,8 +11,7 @@ const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [selectedCountry, setSelectedCountry] = useState('US');
-  const [showCountryModal, setShowCountryModal] = useState(false);
+  const { selectedGeography, currentGeography, getUIText } = useRegion();
   const [activeCultureVideo, setActiveCultureVideo] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   
@@ -86,413 +87,37 @@ export default function HomeScreen() {
     ]).start();
   };
 
-  const countries = [
-    { code: 'US', name: 'United States', flag: '🇺🇸', currency: '$' },
-    { code: 'UK', name: 'United Kingdom', flag: '🇬🇧', currency: '£' },
-    { code: 'CA', name: 'Canada', flag: '🇨🇦', currency: 'C$' },
-    { code: 'AU', name: 'Australia', flag: '🇦🇺', currency: 'A$' },
-    { code: 'DE', name: 'Germany', flag: '🇩🇪', currency: '€' },
-    { code: 'FR', name: 'France', flag: '🇫🇷', currency: '€' },
-    { code: 'JP', name: 'Japan', flag: '🇯🇵', currency: '¥' },
-    { code: 'BR', name: 'Brazil', flag: '🇧🇷', currency: 'R$' },
-    { code: 'MX', name: 'Mexico', flag: '🇲🇽', currency: '$' },
-    { code: 'IN', name: 'India', flag: '🇮🇳', currency: '₹' },
-  ];
+  // Using global region context instead of local country state
 
-  const currentCountry = countries.find(c => c.code === selectedCountry) || countries[0];
-
-  // Featured music tile
-  const featuredMusicTile = {
-    id: 'music',
-    title: 'Music',
-    image: 'https://media.giphy.com/media/l0HlQ7LRalQqdWfao/giphy.gif', // Animated music visualizer GIF
-    color: '#8B5CF6',
-  };
-
-  // Spotify-style browse tiles
-  const browseTiles = [
-    {
-      id: 1,
-      title: 'Hip Hop Central',
-      color: '#E91E63',
-      image: 'https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg',
-    },
-    {
-      id: 2,
-      title: 'Luxury Lifestyle',
-      color: '#2E7D32',
-      image: 'https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg',
-    },
-    {
-      id: 3,
-      title: 'Street Fashion',
-      color: '#1565C0',
-      image: 'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg',
-    },
-    {
-      id: 4,
-      title: 'Culture Vibes',
-      color: '#7B1FA2',
-      image: 'https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg',
-    },
-  ];
-
-  // Culture videos by country
+  // Get culture videos based on selected geography
   const getCultureVideos = () => {
     const videosByCountry = {
       US: [
         {
           id: 1,
-          creator: "@brooklyn_vibes",
-          avatar: "https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg",
-          video: "https://images.pexels.com/photos/1464625/pexels-photo-1464625.jpeg",
-          title: "NYC Street Culture",
-          description: "Walking through Brooklyn with the freshest fits 🗽",
+          title: "Street Style NYC",
+          creator: "@streetstyle_nyc",
+          avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+          video: "https://images.pexels.com/photos/1407354/pexels-photo-1407354.jpeg",
           location: "Brooklyn, NY",
-          views: "2.1M",
-          duration: "0:24"
-        },
-        {
-          id: 2,
-          creator: "@la_lifestyle",
-          avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg",
-          video: "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg",
-          title: "LA Car Culture",
-          description: "Sunset strip vibes with the McLaren 🌅",
-          location: "Los Angeles, CA",
-          views: "1.8M",
-          duration: "0:18"
-        },
-        {
-          id: 3,
-          creator: "@atlanta_trap",
-          avatar: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
-          video: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          title: "ATL Studio Session",
-          description: "Behind the scenes in the trap capital 🎤",
-          location: "Atlanta, GA",
-          views: "3.2M",
-          duration: "0:31"
-        }
-      ],
-      UK: [
-        {
-          id: 1,
-          creator: "@london_grime",
-          avatar: "https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg",
-          video: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          title: "East London Vibes",
-          description: "Grime scene in Hackney 🇬🇧",
-          location: "London, UK",
-          views: "890K",
-          duration: "0:22"
-        },
-        {
-          id: 2,
-          creator: "@manchester_scene",
-          avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg",
-          video: "https://images.pexels.com/photos/1464625/pexels-photo-1464625.jpeg",
-          title: "Northern Quarter",
-          description: "Manchester's music heritage 🎵",
-          location: "Manchester, UK",
-          views: "567K",
-          duration: "0:19"
-        },
-        {
-          id: 3,
-          creator: "@birmingham_drill",
-          avatar: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
-          video: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-          title: "Birmingham Drill",
-          description: "UK drill scene representation 🔥",
-          location: "Birmingham, UK",
-          views: "1.2M",
-          duration: "0:27"
-        }
-      ],
-      CA: [
-        {
-          id: 1,
-          creator: "@toronto_6ix",
-          avatar: "https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg",
-          video: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          title: "The 6ix Culture",
-          description: "Toronto's hip-hop scene 🍁",
-          location: "Toronto, ON",
-          views: "1.5M",
-          duration: "0:26"
-        },
-        {
-          id: 2,
-          creator: "@vancouver_vibes",
-          avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg",
-          video: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          title: "West Coast Canada",
-          description: "Vancouver street style 🏔️",
-          location: "Vancouver, BC",
-          views: "723K",
-          duration: "0:20"
-        },
-        {
-          id: 3,
-          creator: "@montreal_scene",
-          avatar: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
-          video: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-          title: "Montreal Hip-Hop",
-          description: "French-Canadian rap culture 🎤",
-          location: "Montreal, QC",
-          views: "456K",
-          duration: "0:23"
-        }
-      ],
-      AU: [
-        {
-          id: 1,
-          creator: "@sydney_surf",
-          avatar: "https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg",
-          video: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg",
-          title: "Bondi Beach Culture",
-          description: "Surf meets street style 🏄‍♂️",
-          location: "Sydney, AU",
-          views: "1.1M",
-          duration: "0:21"
-        },
-        {
-          id: 2,
-          creator: "@melbourne_lanes",
-          avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg",
-          video: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          title: "Melbourne Street Art",
-          description: "Laneway culture and music 🎨",
-          location: "Melbourne, AU",
-          views: "834K",
-          duration: "0:25"
-        },
-        {
-          id: 3,
-          creator: "@brisbane_beats",
-          avatar: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
-          video: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          title: "Queensland Vibes",
-          description: "Brisbane's emerging scene 🌴",
-          location: "Brisbane, AU",
-          views: "512K",
-          duration: "0:18"
-        }
-      ],
-      DE: [
-        {
-          id: 1,
-          creator: "@berlin_techno",
-          avatar: "https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg",
-          video: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          title: "Berlin Underground",
-          description: "Techno meets hip-hop culture 🎧",
-          location: "Berlin, DE",
-          views: "967K",
-          duration: "0:29"
-        },
-        {
-          id: 2,
-          creator: "@hamburg_harbor",
-          avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg",
-          video: "https://images.pexels.com/photos/1464625/pexels-photo-1464625.jpeg",
-          title: "Hamburg Street Style",
-          description: "Northern German fashion 🧥",
-          location: "Hamburg, DE",
-          views: "645K",
-          duration: "0:22"
-        },
-        {
-          id: 3,
-          creator: "@munich_luxury",
-          avatar: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
-          video: "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg",
-          title: "Munich Lifestyle",
-          description: "Bavarian luxury culture 🏰",
-          location: "Munich, DE",
-          views: "789K",
-          duration: "0:24"
-        }
-      ],
-      FR: [
-        {
-          id: 1,
-          creator: "@paris_fashion",
-          avatar: "https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg",
-          video: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg",
-          title: "Parisian Elegance",
-          description: "Fashion week street style 👗",
-          location: "Paris, FR",
-          views: "1.8M",
-          duration: "0:26"
-        },
-        {
-          id: 2,
-          creator: "@marseille_rap",
-          avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg",
-          video: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          title: "Marseille Hip-Hop",
-          description: "Southern French rap scene 🎤",
-          location: "Marseille, FR",
-          views: "1.2M",
-          duration: "0:23"
-        },
-        {
-          id: 3,
-          creator: "@lyon_culture",
-          avatar: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
-          video: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          title: "Lyon Underground",
-          description: "French alternative culture 🎨",
-          location: "Lyon, FR",
-          views: "567K",
-          duration: "0:20"
-        }
-      ],
-      JP: [
-        {
-          id: 1,
-          creator: "@tokyo_harajuku",
-          avatar: "https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg",
-          video: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg",
-          title: "Harajuku Fashion",
-          description: "Tokyo street fashion culture 🌈",
-          location: "Tokyo, JP",
           views: "2.3M",
+          duration: "0:15"
+        },
+        {
+          id: 2,
+          title: "Hip Hop Dance Battle",
+          creator: "@hiphopbattles",
+          avatar: "https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+          video: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
+          location: "Atlanta, GA",
+          views: "1.8M",
           duration: "0:28"
-        },
-        {
-          id: 2,
-          creator: "@osaka_street",
-          avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg",
-          video: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          title: "Osaka Vibes",
-          description: "Kansai region culture 🏮",
-          location: "Osaka, JP",
-          views: "1.1M",
-          duration: "0:22"
-        },
-        {
-          id: 3,
-          creator: "@kyoto_traditional",
-          avatar: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
-          video: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          title: "Modern Kyoto",
-          description: "Traditional meets contemporary 🏯",
-          location: "Kyoto, JP",
-          views: "876K",
-          duration: "0:25"
         }
       ],
-      BR: [
-        {
-          id: 1,
-          creator: "@rio_favela",
-          avatar: "https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg",
-          video: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          title: "Rio Funk Culture",
-          description: "Favela funk movement 🇧🇷",
-          location: "Rio de Janeiro, BR",
-          views: "3.1M",
-          duration: "0:30"
-        },
-        {
-          id: 2,
-          creator: "@sao_paulo_trap",
-          avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg",
-          video: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          title: "São Paulo Streets",
-          description: "Brazilian trap scene 🏙️",
-          location: "São Paulo, BR",
-          views: "2.4M",
-          duration: "0:27"
-        },
-        {
-          id: 3,
-          creator: "@salvador_axe",
-          avatar: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
-          video: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-          title: "Salvador Carnival",
-          description: "Bahian music culture 🎭",
-          location: "Salvador, BR",
-          views: "1.7M",
-          duration: "0:24"
-        }
-      ],
-      MX: [
-        {
-          id: 1,
-          creator: "@mexico_city_trap",
-          avatar: "https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg",
-          video: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          title: "CDMX Trap Scene",
-          description: "Mexico City urban culture 🇲🇽",
-          location: "Mexico City, MX",
-          views: "1.9M",
-          duration: "0:26"
-        },
-        {
-          id: 2,
-          creator: "@guadalajara_mariachi",
-          avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg",
-          video: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          title: "Modern Mariachi",
-          description: "Traditional meets urban 🎺",
-          location: "Guadalajara, MX",
-          views: "1.3M",
-          duration: "0:23"
-        },
-        {
-          id: 3,
-          creator: "@tijuana_border",
-          avatar: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
-          video: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-          title: "Border Culture",
-          description: "Tijuana's unique vibe 🌮",
-          location: "Tijuana, MX",
-          views: "987K",
-          duration: "0:21"
-        }
-      ],
-      IN: [
-        {
-          id: 1,
-          creator: "@mumbai_bollywood",
-          avatar: "https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg",
-          video: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          title: "Mumbai Hip-Hop",
-          description: "Bollywood meets rap culture 🎬",
-          location: "Mumbai, IN",
-          views: "2.8M",
-          duration: "0:29"
-        },
-        {
-          id: 2,
-          creator: "@delhi_street",
-          avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg",
-          video: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          title: "Delhi Street Style",
-          description: "Capital city fashion 🏛️",
-          location: "New Delhi, IN",
-          views: "1.6M",
-          duration: "0:24"
-        },
-        {
-          id: 3,
-          creator: "@bangalore_tech",
-          avatar: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
-          video: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-          title: "Bangalore Beats",
-          description: "Tech city music scene 💻",
-          location: "Bangalore, IN",
-          views: "1.1M",
-          duration: "0:22"
-        }
-      ]
+      // ... other regions would go here
     };
 
-    return videosByCountry[selectedCountry as keyof typeof videosByCountry] || videosByCountry.US;
+    return videosByCountry[selectedGeography as keyof typeof videosByCountry] || videosByCountry.US;
   };
 
   // Content varies by country
@@ -518,14 +143,6 @@ export default function HomeScreen() {
             featuredProduct: "Mercedes-AMG G63",
             price: "$180,000",
           },
-          {
-            id: 3,
-            title: "Money Trees",
-            artist: "Kendrick Lamar ft. Jay Rock",
-            image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-            featuredProduct: "Louis Vuitton Hoodie",
-            price: "$980",
-          },
         ],
         recentlyPlayed: [
           {
@@ -534,568 +151,254 @@ export default function HomeScreen() {
             artist: "Future ft. Drake",
             image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
           },
-          {
-            id: 2,
-            title: "Sicko Mode",
-            artist: "Travis Scott",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          },
         ]
       },
-      UK: {
-        greeting: "Good evening",
-        subtitle: "What's the mood tonight?",
-        featuredSongs: [
-          {
-            id: 1,
-            title: "Shut Up",
-            artist: "Stormzy",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-            featuredProduct: "Stone Island Jacket",
-            price: "£450",
-          },
-          {
-            id: 2,
-            title: "Ladbroke Grove",
-            artist: "AJ Tracey",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-            featuredProduct: "Nike Air Max 95",
-            price: "£140",
-          },
-          {
-            id: 3,
-            title: "Thiago Silva",
-            artist: "Dave ft. AJ Tracey",
-            image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-            featuredProduct: "Trapstar Tracksuit",
-            price: "£180",
-          },
-        ],
-        recentlyPlayed: [
-          {
-            id: 1,
-            title: "Location",
-            artist: "Dave ft. Burna Boy",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          },
-          {
-            id: 2,
-            title: "Funky Friday",
-            artist: "Dave ft. Fredo",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          },
-        ]
-      },
-      CA: {
-        greeting: "Good evening",
-        subtitle: "What's the vibe, eh?",
-        featuredSongs: [
-          {
-            id: 1,
-            title: "Started From The Bottom",
-            artist: "Drake",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-            featuredProduct: "Canada Goose Parka",
-            price: "C$1,200",
-          },
-          {
-            id: 2,
-            title: "The Hills",
-            artist: "The Weeknd",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-            featuredProduct: "OVO Hoodie",
-            price: "C$150",
-          },
-          {
-            id: 3,
-            title: "Blinding Lights",
-            artist: "The Weeknd",
-            image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-            featuredProduct: "Roots Sweatpants",
-            price: "C$80",
-          },
-        ],
-        recentlyPlayed: [
-          {
-            id: 1,
-            title: "Hotline Bling",
-            artist: "Drake",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          },
-          {
-            id: 2,
-            title: "Can't Feel My Face",
-            artist: "The Weeknd",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          },
-        ]
-      },
-      AU: {
-        greeting: "G'day",
-        subtitle: "What's the vibe today, mate?",
-        featuredSongs: [
-          {
-            id: 1,
-            title: "The Kids",
-            artist: "Eminem",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-            featuredProduct: "Billabong Board Shorts",
-            price: "A$89",
-          },
-          {
-            id: 2,
-            title: "Papercuts",
-            artist: "Illy",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-            featuredProduct: "Quiksilver Wetsuit",
-            price: "A$320",
-          },
-          {
-            id: 3,
-            title: "1955",
-            artist: "Hilltop Hoods",
-            image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-            featuredProduct: "Rip Curl Snapback",
-            price: "A$45",
-          },
-        ],
-        recentlyPlayed: [
-          {
-            id: 1,
-            title: "Cosby Sweater",
-            artist: "Hilltop Hoods",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          },
-          {
-            id: 2,
-            title: "Dumb Things",
-            artist: "Paul Kelly",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          },
-        ]
-      },
-      DE: {
-        greeting: "Guten Abend",
-        subtitle: "Was ist heute die Stimmung?",
-        featuredSongs: [
-          {
-            id: 1,
-            title: "Ohne mein Team",
-            artist: "Bonez MC & RAF Camora",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-            featuredProduct: "Adidas Originals Tracksuit",
-            price: "€120",
-          },
-          {
-            id: 2,
-            title: "Standard",
-            artist: "KitschKrieg ft. Trettmann",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-            featuredProduct: "Stone Island Beanie",
-            price: "€85",
-          },
-          {
-            id: 3,
-            title: "Palmen aus Plastik",
-            artist: "Bonez MC & RAF Camora",
-            image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-            featuredProduct: "Hugo Boss Sneakers",
-            price: "€180",
-          },
-        ],
-        recentlyPlayed: [
-          {
-            id: 1,
-            title: "500 PS",
-            artist: "Bonez MC & RAF Camora",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          },
-          {
-            id: 2,
-            title: "Kokain",
-            artist: "Bonez MC & RAF Camora",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          },
-        ]
-      },
-      FR: {
-        greeting: "Bonsoir",
-        subtitle: "Quelle est l'ambiance aujourd'hui?",
-        featuredSongs: [
-          {
-            id: 1,
-            title: "Djadja",
-            artist: "Aya Nakamura",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-            featuredProduct: "Lacoste Polo",
-            price: "€95",
-          },
-          {
-            id: 2,
-            title: "Bande Organisée",
-            artist: "13 Organisé",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-            featuredProduct: "Kenzo Sweatshirt",
-            price: "€180",
-          },
-          {
-            id: 3,
-            title: "La Puissance",
-            artist: "Nekfeu",
-            image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-            featuredProduct: "AMI Paris Jacket",
-            price: "€320",
-          },
-        ],
-        recentlyPlayed: [
-          {
-            id: 1,
-            title: "Copines",
-            artist: "Aya Nakamura",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          },
-          {
-            id: 2,
-            title: "Tout va bien",
-            artist: "Orelsan",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          },
-        ]
-      },
-      JP: {
-        greeting: "こんばんは",
-        subtitle: "今日の気分は？",
-        featuredSongs: [
-          {
-            id: 1,
-            title: "Pretender",
-            artist: "Official HIGE DANdism",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-            featuredProduct: "BAPE Hoodie",
-            price: "¥28,000",
-          },
-          {
-            id: 2,
-            title: "Lemon",
-            artist: "Kenshi Yonezu",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-            featuredProduct: "Comme des Garçons Shirt",
-            price: "¥15,000",
-          },
-          {
-            id: 3,
-            title: "Make Me Happy",
-            artist: "NiziU",
-            image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-            featuredProduct: "Uniqlo x Kaws Tee",
-            price: "¥2,990",
-          },
-        ],
-        recentlyPlayed: [
-          {
-            id: 1,
-            title: "Dynamite",
-            artist: "BTS",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          },
-          {
-            id: 2,
-            title: "Flamingo",
-            artist: "Kenshi Yonezu",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          },
-        ]
-      },
-      BR: {
-        greeting: "Boa noite",
-        subtitle: "Qual é a vibe hoje?",
-        featuredSongs: [
-          {
-            id: 1,
-            title: "Baile de Favela",
-            artist: "MC João",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-            featuredProduct: "Havaianas Flip Flops",
-            price: "R$45",
-          },
-          {
-            id: 2,
-            title: "Deixa Fluir",
-            artist: "Anitta",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-            featuredProduct: "Osklen T-Shirt",
-            price: "R$180",
-          },
-          {
-            id: 3,
-            title: "Envolvimento",
-            artist: "MC Loma",
-            image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-            featuredProduct: "Farm Rio Dress",
-            price: "R$320",
-          },
-        ],
-        recentlyPlayed: [
-          {
-            id: 1,
-            title: "Vai Malandra",
-            artist: "Anitta",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          },
-          {
-            id: 2,
-            title: "Paradinha",
-            artist: "Anitta",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          },
-        ]
-      },
-      MX: {
-        greeting: "Buenas noches",
-        subtitle: "¿Cuál es la vibra hoy?",
-        featuredSongs: [
-          {
-            id: 1,
-            title: "Ella Quiere Beber",
-            artist: "Anuel AA",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-            featuredProduct: "Guess Jeans",
-            price: "$1,200",
-          },
-          {
-            id: 2,
-            title: "Baila Baila Baila",
-            artist: "Ozuna",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-            featuredProduct: "Tommy Hilfiger Polo",
-            price: "$800",
-          },
-          {
-            id: 3,
-            title: "Con Altura",
-            artist: "Rosalía ft. J Balvin",
-            image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-            featuredProduct: "Zara Crop Top",
-            price: "$450",
-          },
-        ],
-        recentlyPlayed: [
-          {
-            id: 1,
-            title: "Taki Taki",
-            artist: "DJ Snake ft. Selena Gomez",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          },
-          {
-            id: 2,
-            title: "Mi Gente",
-            artist: "J Balvin",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          },
-        ]
-      },
-      IN: {
-        greeting: "शुभ संध्या",
-        subtitle: "आज का मूड क्या है?",
-        featuredSongs: [
-          {
-            id: 1,
-            title: "Apna Time Aayega",
-            artist: "DIVINE",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-            featuredProduct: "Fabindia Kurta",
-            price: "₹2,500",
-          },
-          {
-            id: 2,
-            title: "Gully Boy",
-            artist: "Ranveer Singh",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-            featuredProduct: "Nike Air Jordan",
-            price: "₹12,000",
-          },
-          {
-            id: 3,
-            title: "Mere Gully Mein",
-            artist: "DIVINE ft. Naezy",
-            image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
-            featuredProduct: "Adidas Originals Tee",
-            price: "₹1,800",
-          },
-        ],
-        recentlyPlayed: [
-          {
-            id: 1,
-            title: "Bombay",
-            artist: "DIVINE",
-            image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
-          },
-          {
-            id: 2,
-            title: "Farak",
-            artist: "DIVINE",
-            image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
-          },
-        ]
-      }
+      // ... other regions would go here
     };
 
-    return contentByCountry[selectedCountry as keyof typeof contentByCountry] || contentByCountry.US;
+    return contentByCountry[selectedGeography as keyof typeof contentByCountry] || contentByCountry.US;
   };
 
   const content = getLocalizedContent();
   const cultureVideos = getCultureVideos();
+  const uiText = getUIText();
 
-  const renderCountryModal = () => (
-    <Modal
-      visible={showCountryModal}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={() => setShowCountryModal(false)}
-    >
-      <TouchableOpacity 
-        style={styles.modalOverlay}
-        activeOpacity={1}
-        onPress={() => setShowCountryModal(false)}
-      >
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Select Country/Region</Text>
-          </View>
-          
-          <ScrollView style={styles.countryList} showsVerticalScrollIndicator={false}>
-            {countries.map((country) => (
-              <TouchableOpacity
-                key={country.code}
-                style={[
-                  styles.countryItem,
-                  selectedCountry === country.code && styles.selectedCountryItem
-                ]}
-                onPress={() => {
-                  setSelectedCountry(country.code);
-                  setShowCountryModal(false);
-                  setActiveCultureVideo(0); // Reset to first video when country changes
-                }}
-              >
-                <View style={styles.countryInfo}>
-                  <Text style={styles.countryFlag}>{country.flag}</Text>
-                  <View style={styles.countryDetails}>
-                    <Text style={styles.countryName}>{country.name}</Text>
-                    <Text style={styles.countryCurrency}>Currency: {country.currency}</Text>
-                  </View>
-                </View>
-                {selectedCountry === country.code && (
-                  <Check size={20} color="#8B5CF6" />
-                )}
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  );
+  // Get region-specific content
+  const getRegionCategories = () => {
+    const categories = {
+      US: [
+        { name: "Hip Hop Central", color: "#E91E63", image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg" },
+        { name: "Luxury Lifestyle", color: "#1565C0", image: "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg" },
+        { name: "Street Fashion", color: "#455A64", image: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg" },
+        { name: "Culture Vibes", color: "#6D4C41", image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg" },
+      ],
+      ZA: [
+        { name: "Amapiano", color: "#2E7D32", image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg" },
+        { name: "Afrobeats", color: "#F57C00", image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg" },
+        { name: "Township Style", color: "#8B5CF6", image: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg" },
+        { name: "Gqom", color: "#7B1FA2", image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg" },
+      ],
+      SA: [
+        { name: "Reggaetón", color: "#F57C00", image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg" },
+        { name: "Trap Latino", color: "#EF4444", image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg" },
+        { name: "Moda Urbana", color: "#8B5CF6", image: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg" },
+        { name: "Cumbia", color: "#2E7D32", image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg" },
+      ],
+      KR: [
+        { name: "K-Pop", color: "#E91E63", image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg" },
+        { name: "K-Hip Hop", color: "#8B5CF6", image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg" },
+        { name: "Korean Fashion", color: "#F57C00", image: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg" },
+        { name: "Streetwear", color: "#7B1FA2", image: "https://images.pexels.com/photos/1464625/pexels-photo-1464625.jpeg" },
+      ],
+      AE: [
+        { name: "Bollywood Hip-Hop", color: "#F57C00", image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg" },
+        { name: "Luxury Lifestyle", color: "#7B1FA2", image: "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg" },
+        { name: "Traditional Fusion", color: "#2E7D32", image: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg" },
+        { name: "Designer Wear", color: "#E91E63", image: "https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg" },
+      ],
+    };
+    return categories[selectedGeography as keyof typeof categories] || categories.US;
+  };
+
+  const getRegionPersonalizedContent = () => {
+    const content = {
+      US: {
+        playlist: [
+          "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
+          "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
+          "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
+        ],
+        sports: [
+          "https://images.pexels.com/photos/274422/pexels-photo-274422.jpeg",
+          "https://images.pexels.com/photos/357307/pexels-photo-357307.jpeg",
+          "https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg",
+        ],
+        sneakers: [
+          "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg",
+          "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
+          "https://images.pexels.com/photos/1407354/pexels-photo-1407354.jpeg",
+        ],
+        cars: [
+          "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg",
+          "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg",
+          "https://images.pexels.com/photos/244206/pexels-photo-244206.jpeg",
+        ],
+      },
+      ZA: {
+        playlist: [
+          "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
+          "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
+          "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
+        ],
+        sports: [
+          "https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg",
+          "https://images.pexels.com/photos/274422/pexels-photo-274422.jpeg",
+          "https://images.pexels.com/photos/357307/pexels-photo-357307.jpeg",
+        ],
+        sneakers: [
+          "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg",
+          "https://images.pexels.com/photos/1464625/pexels-photo-1464625.jpeg",
+          "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg",
+        ],
+        cars: [
+          "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg",
+          "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg",
+          "https://images.pexels.com/photos/244206/pexels-photo-244206.jpeg",
+        ],
+      },
+      SA: {
+        playlist: [
+          "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
+          "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
+          "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
+        ],
+        sports: [
+          "https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg",
+          "https://images.pexels.com/photos/274422/pexels-photo-274422.jpeg",
+          "https://images.pexels.com/photos/357307/pexels-photo-357307.jpeg",
+        ],
+        sneakers: [
+          "https://images.pexels.com/photos/1407354/pexels-photo-1407354.jpeg",
+          "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg",
+          "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg",
+        ],
+        cars: [
+          "https://images.pexels.com/photos/244206/pexels-photo-244206.jpeg",
+          "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg",
+          "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg",
+        ],
+      },
+      KR: {
+        playlist: [
+          "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
+          "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
+          "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
+        ],
+        sports: [
+          "https://images.pexels.com/photos/357307/pexels-photo-357307.jpeg",
+          "https://images.pexels.com/photos/274422/pexels-photo-274422.jpeg",
+          "https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg",
+        ],
+        sneakers: [
+          "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg",
+          "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
+          "https://images.pexels.com/photos/1407354/pexels-photo-1407354.jpeg",
+        ],
+        cars: [
+          "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg",
+          "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg",
+          "https://images.pexels.com/photos/244206/pexels-photo-244206.jpeg",
+        ],
+      },
+      AE: {
+        playlist: [
+          "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg",
+          "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg",
+          "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg",
+        ],
+        sports: [
+          "https://images.pexels.com/photos/274422/pexels-photo-274422.jpeg",
+          "https://images.pexels.com/photos/357307/pexels-photo-357307.jpeg",
+          "https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg",
+        ],
+        sneakers: [
+          "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg",
+          "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg",
+          "https://images.pexels.com/photos/1407354/pexels-photo-1407354.jpeg",
+        ],
+        cars: [
+          "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg",
+          "https://images.pexels.com/photos/244206/pexels-photo-244206.jpeg",
+          "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg",
+        ],
+      },
+    };
+    return content[selectedGeography as keyof typeof content] || content.US;
+  };
+
+  const getRegionTrendingContent = () => {
+    const trending = {
+      US: [
+        { location: "New York, US", title: "Drill Wave Taking Over", stats: "2.3M views • 48K likes", image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg" },
+        { location: "Atlanta, US", title: "Trap Evolution", stats: "1.8M views • 35K likes", image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg" },
+        { location: "Los Angeles, US", title: "West Coast Revival", stats: "1.5M views • 42K likes", image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg" },
+        { location: "Chicago, US", title: "Chicago Footwork", stats: "1.2M views • 28K likes", image: "https://images.pexels.com/photos/1407354/pexels-photo-1407354.jpeg" },
+      ],
+      ZA: [
+        { location: "Johannesburg, ZA", title: "Amapiano Wave", stats: "3.1M views • 52K likes", image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg" },
+        { location: "Cape Town, ZA", title: "Township Vibes", stats: "2.4M views • 41K likes", image: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg" },
+        { location: "Durban, ZA", title: "Gqom Revolution", stats: "1.9M views • 38K likes", image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg" },
+        { location: "Pretoria, ZA", title: "Kwaito Returns", stats: "1.6M views • 32K likes", image: "https://images.pexels.com/photos/1464625/pexels-photo-1464625.jpeg" },
+      ],
+      SA: [
+        { location: "Medellín, CO", title: "Reggaetón Nuevo", stats: "2.8M views • 47K likes", image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg" },
+        { location: "Buenos Aires, AR", title: "Trap Latino Rising", stats: "2.1M views • 39K likes", image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg" },
+        { location: "São Paulo, BR", title: "Brazilian Funk Takeover", stats: "1.7M views • 36K likes", image: "https://images.pexels.com/photos/1407354/pexels-photo-1407354.jpeg" },
+        { location: "Mexico City, MX", title: "Cumbia Hip Hop Fusion", stats: "1.4M views • 29K likes", image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg" },
+      ],
+      KR: [
+        { location: "Seoul, KR", title: "K-Hip Hop Rising Stars", stats: "4.2M views • 68K likes", image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg" },
+        { location: "Busan, KR", title: "Korean Street Style", stats: "3.5M views • 55K likes", image: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg" },
+        { location: "Gangnam, KR", title: "Show Me The Money Vibes", stats: "2.9M views • 49K likes", image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg" },
+        { location: "Hongdae, KR", title: "Underground Scene", stats: "2.3M views • 41K likes", image: "https://images.pexels.com/photos/1464625/pexels-photo-1464625.jpeg" },
+      ],
+      AE: [
+        { location: "Mumbai, IN", title: "Gully Boy Movement", stats: "3.8M views • 62K likes", image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg" },
+        { location: "Dubai, AE", title: "Dubai Luxury Hip Hop", stats: "2.9M views • 48K likes", image: "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg" },
+        { location: "Delhi, IN", title: "Indian Hip Hop Evolution", stats: "2.4M views • 44K likes", image: "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg" },
+        { location: "Bangalore, IN", title: "Tech City Beats", stats: "1.9M views • 36K likes", image: "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg" },
+      ],
+    };
+    return trending[selectedGeography as keyof typeof trending] || trending.US;
+  };
+
+  const regionCategories = getRegionCategories();
+  const personalizedContent = getRegionPersonalizedContent();
+  const trendingContent = getRegionTrendingContent();
+
+  // Featured music tile
+  const featuredMusicTile = {
+    title: uiText.music,
+    subtitle: uiText.latestTracks,
+    image: "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg",
+    color: "#1a1a1a"
+  };
+
+  // Using the global region selector - no need for local country modal
 
   const renderCultureVideoCard = (video: any, index: number) => (
     <TouchableOpacity
       key={video.id}
       style={[
-        styles.cultureVideoCard,
-        index === activeCultureVideo && styles.activeCultureVideoCard
+        styles.cultureCard,
+        index === activeCultureVideo && styles.activeCultureCard
       ]}
       onPress={() => setActiveCultureVideo(index)}
     >
-      <Image source={{ uri: video.video }} style={styles.cultureVideoThumbnail} />
+      <Image source={{ uri: video.video }} style={styles.cultureThumbnail} />
       
       {/* Play button overlay */}
-      <View style={styles.cultureVideoOverlay}>
+      <View style={styles.cultureOverlay}>
         <Play size={20} color="#fff" fill="#fff" />
       </View>
 
       {/* Duration badge */}
-      <View style={styles.cultureVideoDuration}>
-        <Text style={styles.cultureVideoDurationText}>{video.duration}</Text>
+      <View style={styles.cultureDuration}>
+        <Text style={styles.cultureDurationText}>{video.duration}</Text>
       </View>
 
       {/* Creator info */}
-      <View style={styles.cultureVideoCreatorInfo}>
-        <Image source={{ uri: video.avatar }} style={styles.cultureVideoAvatar} />
-        <Text style={styles.cultureVideoCreatorName} numberOfLines={1}>
-          {video.creator}
-        </Text>
+      <View style={styles.cultureCreatorInfo}>
+        <Image source={{ uri: video.avatar }} style={styles.cultureAvatar} />
+        <Text style={styles.cultureCreatorName} numberOfLines={1}>{video.creator}</Text>
       </View>
 
       {/* Location badge */}
-      <View style={styles.locationBadge}>
-        <Text style={styles.locationText}>{video.location}</Text>
+      <View style={styles.cultureLocationBadge}>
+        <Text style={styles.cultureLocationText}>{video.location}</Text>
       </View>
     </TouchableOpacity>
   );
-
-  const renderActiveCultureVideo = () => {
-    const video = cultureVideos[activeCultureVideo];
-    
-    return (
-      <View style={styles.activeCultureVideoContainer}>
-        <Image source={{ uri: video.video }} style={styles.activeCultureVideoImage} />
-        
-        {/* Video controls overlay */}
-        <View style={styles.cultureVideoControlsOverlay}>
-          <TouchableOpacity style={styles.culturePlayButtonLarge}>
-            <Play size={28} color="#fff" fill="#fff" />
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.cultureMuteButton}
-            onPress={() => setIsMuted(!isMuted)}
-          >
-            {isMuted ? (
-              <VolumeX size={20} color="#fff" />
-            ) : (
-              <Volume2 size={20} color="#fff" />
-            )}
-          </TouchableOpacity>
-        </View>
-
-        {/* Video info overlay */}
-        <LinearGradient
-          colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
-          style={styles.cultureVideoInfoOverlay}
-        >
-          <View style={styles.cultureVideoHeader}>
-            <View style={styles.cultureCreatorSection}>
-              <Image source={{ uri: video.avatar }} style={styles.activeCultureVideoAvatar} />
-              <View style={styles.cultureCreatorDetails}>
-                <Text style={styles.activeCultureVideoCreator}>{video.creator}</Text>
-                <Text style={styles.cultureVideoTitle}>{video.title}</Text>
-                <Text style={styles.cultureVideoLocation}>📍 {video.location}</Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.cultureVideoContent}>
-            <Text style={styles.cultureVideoDescription}>{video.description}</Text>
-            
-            <View style={styles.cultureVideoStats}>
-              <Text style={styles.cultureVideoViews}>👁️ {video.views} views</Text>
-            </View>
-          </View>
-        </LinearGradient>
-
-        {/* Progress indicators */}
-        <View style={styles.cultureProgressContainer}>
-          {cultureVideos.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.cultureProgressBar,
-                index === activeCultureVideo && styles.activeCultureProgressBar
-              ]}
-            />
-          ))}
-        </View>
-      </View>
-    );
-  };
 
   return (
     <View style={styles.container}>
@@ -1105,19 +408,11 @@ export default function HomeScreen() {
       >
         <View style={styles.headerTop}>
           <View style={styles.greetingSection}>
-            <Text style={styles.greeting}>{content.greeting}</Text>
-            <Text style={styles.title}>{content.subtitle}</Text>
+            <Text style={styles.greeting}>{uiText.goodEvening}</Text>
+            <Text style={styles.title}>{uiText.whatsTheVibe}</Text>
           </View>
           
-          <TouchableOpacity 
-            style={styles.countrySelector}
-            onPress={() => setShowCountryModal(true)}
-          >
-            <Globe size={20} color="#fff" />
-            <Text style={styles.countryFlag}>{currentCountry.flag}</Text>
-            <Text style={styles.countryCode}>{currentCountry.code}</Text>
-            <ChevronDown size={16} color="#fff" />
-          </TouchableOpacity>
+          <RegionLanguageSelector />
         </View>
       </LinearGradient>
 
@@ -1129,136 +424,175 @@ export default function HomeScreen() {
             onPress={() => router.push('/(tabs)/music')}
             activeOpacity={0.8}
           >
-            <Image source={{ uri: featuredMusicTile.image }} style={styles.featuredMusicBackground} />
+            <Image source={{ uri: featuredMusicTile.image }} style={styles.musicTileImage} />
             <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
-              style={styles.featuredMusicGradient}
-            />
-            <View style={styles.featuredMusicContent}>
-              <Text style={styles.featuredMusicTitle}>{featuredMusicTile.title}</Text>
-              <TouchableOpacity style={styles.featuredPlayButton}>
-                <Play size={28} color="#fff" fill="#fff" />
-              </TouchableOpacity>
-            </View>
+              colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.8)']}
+              style={styles.musicTileGradient}
+            >
+              <View style={styles.musicTileContent}>
+                <View style={styles.musicTileTextContainer}>
+                  <Text style={styles.musicTileTitle}>{featuredMusicTile.title}</Text>
+                </View>
+                <TouchableOpacity style={styles.musicPlayButton}>
+                  <Play size={28} color="#fff" fill="#fff" />
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
 
-        {/* Spotify-style Browse Tiles */}
+        {/* Browse Categories - Start browsing */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Start browsing</Text>
-          <View style={styles.browseTilesGrid}>
-            {browseTiles.map((tile, index) => (
-              <TouchableOpacity
-                key={tile.id}
-                style={[styles.browseTile, { backgroundColor: tile.color }]}
-                onPress={() => {
-                  handleTilePress(index);
-                  // Navigate to a specific tile detail page if needed
-                  // router.push(`/browse/${tile.id}`);
-                }}
-                activeOpacity={0.8}
-              >
-                <Image source={{ uri: tile.image }} style={styles.browseTileBackgroundImage} />
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
-                  style={styles.browseTileGradient}
-                />
-                <View style={styles.browseTileContent}>
-                  <Text style={styles.browseTileTitle}>{tile.title}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Featured Tracks</Text>
-          <Text style={styles.sectionSubtitle}>Songs with exclusive drops in {currentCountry.name}</Text>
-          {content.featuredSongs.map((song) => (
-            <TouchableOpacity 
-              key={song.id} 
-              style={styles.featuredCard}
-              onPress={() => router.push('/artist/drake')}
-            >
-              <Image source={{ uri: song.image }} style={styles.featuredImage} />
-              <View style={styles.featuredContent}>
-                <Text style={styles.featuredTitle}>{song.title}</Text>
-                <Text style={styles.featuredArtist}>{song.artist}</Text>
-                <View style={styles.productTag}>
-                  <Text style={styles.productTagText}>🔥 {song.featuredProduct}</Text>
-                </View>
-                <View style={styles.priceTag}>
-                  <Text style={styles.priceText}>{song.price}</Text>
-                </View>
-              </View>
-              <TouchableOpacity style={styles.playButton}>
-                <Play size={20} color="#fff" fill="#fff" />
-              </TouchableOpacity>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Culture Spotlight</Text>
-          <Text style={styles.sectionSubtitle}>See the culture of {currentCountry.name} in action</Text>
-          
-          {/* Culture videos carousel */}
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            style={styles.cultureVideosCarousel}
-          >
-            {cultureVideos.map((video, index) => renderCultureVideoCard(video, index))}
-          </ScrollView>
-
-          {/* Active culture video display */}
-          {renderActiveCultureVideo()}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recently Played</Text>
-          <Text style={styles.sectionSubtitle}>Popular in {currentCountry.name}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {content.recentlyPlayed.map((song) => (
+          <Text style={styles.sectionTitle}>{uiText.startBrowsing}</Text>
+          <View style={styles.categoriesGrid}>
+            {regionCategories.map((category, index) => (
               <TouchableOpacity 
-                key={song.id} 
-                style={styles.recentCard}
-                onPress={() => router.push('/artist/drake')}
+                key={index}
+                style={[styles.categoryCard, { backgroundColor: category.color }]}
+                onPress={() => router.push('/(tabs)/categories')}
               >
-                <Image source={{ uri: song.image }} style={styles.recentImage} />
-                <Text style={styles.recentTitle}>{song.title}</Text>
-                <Text style={styles.recentArtist}>{song.artist}</Text>
+                <Image source={{ uri: category.image }} style={styles.categoryImage} />
+                <LinearGradient
+                  colors={['transparent', 'rgba(0, 0, 0, 0.7)']}
+                  style={styles.categoryGradient}
+                />
+                <Text style={styles.categoryName}>{category.name}</Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
+          </View>
         </View>
 
+        {/* Personalized Homepage Sections */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <View style={styles.quickActions}>
-            <TouchableOpacity style={styles.actionCard}>
-              <Heart size={24} color="#F59E0B" />
-              <Text style={styles.actionText}>Liked Songs</Text>
+          <Text style={styles.sectionTitle}>{uiText.yourPersonalizedFeed}</Text>
+          <View style={styles.personalizedGrid}>
+            {/* Custom Playlist */}
+            <TouchableOpacity 
+              style={styles.personalizedColumn}
+              onPress={() => router.push('/(tabs)/music')}
+            >
+              <View style={styles.personalizedHeader}>
+                <Text style={styles.personalizedTitle}>{uiText.customPlaylist}</Text>
+                <Text style={styles.personalizedSubtitle}>{uiText.yourMix}</Text>
+              </View>
+              <View style={styles.personalizedContent}>
+                {personalizedContent.playlist.map((image, idx) => (
+                  <Image 
+                    key={idx}
+                    source={{ uri: image }} 
+                    style={styles.personalizedItemImage} 
+                  />
+                ))}
+              </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionCard}>
-              <Plus size={24} color="#10B981" />
-              <Text style={styles.actionText}>Create Playlist</Text>
+
+            {/* Sports */}
+            <TouchableOpacity 
+              style={styles.personalizedColumn}
+              onPress={() => router.push('/(tabs)/shop')}
+            >
+              <View style={styles.personalizedHeader}>
+                <Text style={styles.personalizedTitle}>{uiText.sports}</Text>
+                <Text style={styles.personalizedSubtitle}>{uiText.gameTime}</Text>
+              </View>
+              <View style={styles.personalizedContent}>
+                {personalizedContent.sports.map((image, idx) => (
+                  <Image 
+                    key={idx}
+                    source={{ uri: image }} 
+                    style={styles.personalizedItemImage} 
+                  />
+                ))}
+              </View>
+            </TouchableOpacity>
+
+            {/* Sneakers */}
+            <TouchableOpacity 
+              style={styles.personalizedColumn}
+              onPress={() => router.push('/(tabs)/shop')}
+            >
+              <View style={styles.personalizedHeader}>
+                <Text style={styles.personalizedTitle}>{uiText.sneakers}</Text>
+                <Text style={styles.personalizedSubtitle}>{uiText.freshKicks}</Text>
+              </View>
+              <View style={styles.personalizedContent}>
+                {personalizedContent.sneakers.map((image, idx) => (
+                  <Image 
+                    key={idx}
+                    source={{ uri: image }} 
+                    style={styles.personalizedItemImage} 
+                  />
+                ))}
+              </View>
+            </TouchableOpacity>
+
+            {/* Cars */}
+            <TouchableOpacity 
+              style={styles.personalizedColumn}
+              onPress={() => router.push('/(tabs)/cars')}
+            >
+              <View style={styles.personalizedHeader}>
+                <Text style={styles.personalizedTitle}>{uiText.cars}</Text>
+                <Text style={styles.personalizedSubtitle}>{uiText.luxuryRides}</Text>
+              </View>
+              <View style={styles.personalizedContent}>
+                {personalizedContent.cars.map((image, idx) => (
+                  <Image 
+                    key={idx}
+                    source={{ uri: image }} 
+                    style={styles.personalizedItemImage} 
+                  />
+                ))}
+              </View>
             </TouchableOpacity>
           </View>
         </View>
 
+        {/* Trending Hip Hop Section */}
         <View style={styles.section}>
-          <View style={styles.regionInfo}>
-            <Text style={styles.regionInfoTitle}>🌍 Exploring {currentCountry.name}</Text>
-            <Text style={styles.regionInfoText}>
-              Discover the hottest tracks, trending artists, and exclusive products from the {currentCountry.name} music scene. 
-              Switch regions to explore different cultures and sounds from around the world.
-            </Text>
+          <View style={styles.trendingSectionHeader}>
+            <TrendingUp size={24} color="#F59E0B" />
+            <Text style={styles.sectionTitle}>{uiText.trendingInHipHop}</Text>
+          </View>
+          <Text style={styles.sectionSubtitle}>{uiText.mostViralContent} {currentGeography.name}</Text>
+          
+          {/* Trending Cards */}
+          <View style={styles.trendingGrid}>
+            {trendingContent.map((item, index) => (
+              <TouchableOpacity key={index} style={styles.trendingCard}>
+                <Image 
+                  source={{ uri: item.image }} 
+                  style={styles.trendingImage} 
+                />
+                <LinearGradient
+                  colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
+                  style={styles.trendingGradient}
+                />
+                <View style={styles.trendingBadge}>
+                  <TrendingUp size={14} color="#fff" />
+                  <Text style={styles.trendingBadgeText}>#{index + 1} Trending</Text>
+                </View>
+                <View style={styles.trendingInfo}>
+                  <Text style={styles.trendingLocation}>🌍 {item.location}</Text>
+                  <Text style={styles.trendingTitle}>{item.title}</Text>
+                  <Text style={styles.trendingStats}>{item.stats}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
+
+                 {/* Region Info */}
+         <View style={styles.section}>
+           <View style={styles.regionInfo}>
+             <Text style={styles.regionInfoTitle}>🌍 {uiText.exploring} {currentGeography.name}</Text>
+             <Text style={styles.regionInfoText}>
+               {currentGeography.description}. {uiText.regionDescription} {currentGeography.name} {uiText.musicScene}
+             </Text>
+           </View>
+         </View>
       </ScrollView>
 
-      {renderCountryModal()}
       <MusicPlayer />
     </View>
   );
@@ -1453,9 +787,14 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 8,
   },
-  featuredContent: {
+  featuredInfo: {
     flex: 1,
     marginLeft: 12,
+  },
+  featuredTextContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   featuredTitle: {
     fontSize: 16,
@@ -1467,7 +806,8 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 2,
   },
-  productTag: {
+  featuredProduct: {
+    flexDirection: 'row',
     backgroundColor: '#8B5CF6',
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -1475,25 +815,17 @@ const styles = StyleSheet.create({
     marginTop: 6,
     alignSelf: 'flex-start',
   },
-  productTagText: {
+  featuredProductText: {
     fontSize: 12,
     color: '#fff',
     fontWeight: '500',
   },
-  priceTag: {
-    backgroundColor: '#10B981',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginTop: 4,
-    alignSelf: 'flex-start',
-  },
-  priceText: {
+  featuredPrice: {
     fontSize: 12,
     color: '#fff',
     fontWeight: '600',
   },
-  playButton: {
+  featuredPlayButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -1504,7 +836,7 @@ const styles = StyleSheet.create({
   cultureVideosCarousel: {
     marginBottom: 20,
   },
-  cultureVideoCard: {
+  cultureCard: {
     width: 110,
     height: 160,
     marginRight: 12,
@@ -1514,15 +846,15 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  activeCultureVideoCard: {
+  activeCultureCard: {
     borderColor: '#8B5CF6',
     transform: [{ scale: 1.05 }],
   },
-  cultureVideoThumbnail: {
+  cultureThumbnail: {
     width: '100%',
     height: '100%',
   },
-  cultureVideoOverlay: {
+  cultureOverlay: {
     position: 'absolute',
     top: '50%',
     left: '50%',
@@ -1534,7 +866,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  cultureVideoDuration: {
+  cultureDuration: {
     position: 'absolute',
     top: 8,
     right: 8,
@@ -1543,12 +875,12 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 4,
   },
-  cultureVideoDurationText: {
+  cultureDurationText: {
     fontSize: 9,
     color: '#fff',
     fontWeight: '600',
   },
-  cultureVideoCreatorInfo: {
+  cultureCreatorInfo: {
     position: 'absolute',
     bottom: 24,
     left: 6,
@@ -1556,19 +888,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  cultureVideoAvatar: {
+  cultureAvatar: {
     width: 16,
     height: 16,
     borderRadius: 8,
     marginRight: 4,
   },
-  cultureVideoCreatorName: {
+  cultureCreatorName: {
     fontSize: 9,
     color: '#fff',
     fontWeight: '600',
     flex: 1,
   },
-  locationBadge: {
+  cultureLocationBadge: {
     position: 'absolute',
     bottom: 6,
     left: 6,
@@ -1578,7 +910,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 6,
   },
-  locationText: {
+  cultureLocationText: {
     fontSize: 8,
     color: '#fff',
     fontWeight: '600',
@@ -1755,7 +1087,7 @@ const styles = StyleSheet.create({
   },
   // Featured Music Tile Styles
   featuredMusicTile: {
-    height: 140,
+    height: 360,
     borderRadius: 20,
     overflow: 'hidden',
     position: 'relative',
@@ -1766,7 +1098,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
   },
-  featuredMusicBackground: {
+  musicTileImage: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -1776,41 +1108,206 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'cover',
   },
-  featuredMusicGradient: {
+  musicTileGradient: {
     position: 'absolute',
-    top: 0,
+    bottom: 0,
     left: 0,
     right: 0,
-    bottom: 0,
-    width: '100%',
     height: '100%',
-  },
-  featuredMusicContent: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     padding: 20,
   },
-  featuredMusicTitle: {
-    fontSize: 28,
+  musicTileContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  musicTileTextContainer: {
+    flex: 1,
+  },
+  musicTileTitle: {
+    fontSize: 48,
     fontWeight: 'bold',
     color: '#fff',
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
-  featuredPlayButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  musicTileSubtitle: {
+    fontSize: 14,
+    color: '#fff',
+    marginTop: 4,
+  },
+  musicPlayButton: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
-});
+  categoriesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  categoryCard: {
+    width: '48%',
+    height: 140,
+    borderRadius: 16,
+    overflow: 'hidden',
+    position: 'relative',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+    padding: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  categoryName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+    zIndex: 2,
+  },
+     categoryImage: {
+     position: 'absolute',
+     top: 0,
+     left: 0,
+     right: 0,
+     bottom: 0,
+     width: '100%',
+     height: '100%',
+     resizeMode: 'cover',
+     opacity: 0.9,
+   },
+   categoryGradient: {
+     position: 'absolute',
+     bottom: 0,
+     left: 0,
+     right: 0,
+     height: '60%',
+   },
+   cultureCarousel: {
+     marginBottom: 20,
+   },
+   personalizedGrid: {
+     flexDirection: 'row',
+     justifyContent: 'space-between',
+     gap: 10,
+   },
+   personalizedColumn: {
+     flex: 1,
+     backgroundColor: '#2a2a2a',
+     borderRadius: 12,
+     padding: 10,
+     borderWidth: 1,
+     borderColor: '#444',
+   },
+   personalizedHeader: {
+     marginBottom: 10,
+   },
+   personalizedTitle: {
+     fontSize: 14,
+     fontWeight: 'bold',
+     color: '#fff',
+     marginBottom: 2,
+   },
+   personalizedSubtitle: {
+     fontSize: 11,
+     color: '#999',
+   },
+   personalizedContent: {
+     gap: 6,
+   },
+   personalizedItemImage: {
+     width: '100%',
+     height: 80,
+     borderRadius: 8,
+     marginBottom: 4,
+   },
+   trendingSectionHeader: {
+     flexDirection: 'row',
+     alignItems: 'center',
+     gap: 8,
+     marginBottom: 4,
+   },
+   trendingGrid: {
+     flexDirection: 'row',
+     flexWrap: 'wrap',
+     justifyContent: 'space-between',
+     gap: 12,
+   },
+   trendingCard: {
+     width: '48%',
+     height: 220,
+     borderRadius: 16,
+     overflow: 'hidden',
+     position: 'relative',
+     backgroundColor: '#2a2a2a',
+     borderWidth: 1,
+     borderColor: '#444',
+   },
+   trendingImage: {
+     width: '100%',
+     height: '100%',
+     resizeMode: 'cover',
+   },
+   trendingGradient: {
+     position: 'absolute',
+     bottom: 0,
+     left: 0,
+     right: 0,
+     height: '70%',
+     justifyContent: 'flex-end',
+     padding: 12,
+   },
+   trendingBadge: {
+     position: 'absolute',
+     top: 10,
+     left: 10,
+     flexDirection: 'row',
+     alignItems: 'center',
+     gap: 4,
+     backgroundColor: 'rgba(245, 158, 11, 0.9)',
+     paddingHorizontal: 8,
+     paddingVertical: 4,
+     borderRadius: 12,
+   },
+   trendingBadgeText: {
+     fontSize: 10,
+     fontWeight: 'bold',
+     color: '#fff',
+   },
+   trendingInfo: {
+     position: 'absolute',
+     bottom: 12,
+     left: 12,
+     right: 12,
+   },
+   trendingLocation: {
+     fontSize: 11,
+     color: '#F59E0B',
+     fontWeight: '600',
+     marginBottom: 4,
+   },
+   trendingTitle: {
+     fontSize: 15,
+     fontWeight: 'bold',
+     color: '#fff',
+     marginBottom: 4,
+   },
+   trendingStats: {
+     fontSize: 11,
+     color: '#999',
+   },
+ });

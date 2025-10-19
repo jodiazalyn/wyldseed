@@ -1,74 +1,30 @@
+import React from 'react';
 import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Image, Dimensions, Modal } from 'react-native';
 import { useState } from 'react';
 import { Search as SearchIcon, TrendingUp, Play, Heart, MessageCircle, Share, Volume2, VolumeX, Globe, ChevronDown, Check, Languages } from 'lucide-react-native';
 import { MusicPlayer } from '@/components/MusicPlayer';
+import { RegionLanguageSelector } from '@/components/RegionLanguageSelector';
+import { useRegion } from '@/hooks/useRegionContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
 export default function SearchScreen() {
+  const { 
+    selectedGeography, 
+    selectedLanguage, 
+    currentGeography, 
+    languageOptions, 
+    geographies, 
+    setSelectedGeography, 
+    setSelectedLanguage, 
+    getUIText, 
+    getSearchPlaceholder 
+  } = useRegion();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
-  const [selectedGeography, setSelectedGeography] = useState('US');
-  const [selectedLanguage, setSelectedLanguage] = useState('english');
-  const [showGeographyModal, setShowGeographyModal] = useState(false);
-  const [showLanguageModal, setShowLanguageModal] = useState(false);
-
-  const geographies = [
-    { 
-      code: 'US', 
-      name: 'United States', 
-      flag: '🇺🇸', 
-      description: 'Hip-hop, R&B, and street culture',
-      color: '#1565C0',
-      nativeLanguage: 'English',
-      nativeCode: 'en'
-    },
-    { 
-      code: 'ZA', 
-      name: 'South Africa', 
-      flag: '🇿🇦', 
-      description: 'Amapiano, Afrobeats, and township culture',
-      color: '#2E7D32',
-      nativeLanguage: 'Afrikaans/Zulu',
-      nativeCode: 'af'
-    },
-    { 
-      code: 'SA', 
-      name: 'South America', 
-      flag: '🌎', 
-      description: 'Reggaeton, Latin trap, and street fashion',
-      color: '#F57C00',
-      nativeLanguage: 'Español',
-      nativeCode: 'es'
-    },
-    { 
-      code: 'KR', 
-      name: 'Korea (Asia)', 
-      flag: '🇰🇷', 
-      description: 'K-pop, K-hip hop, and Korean street style',
-      color: '#E91E63',
-      nativeLanguage: '한국어',
-      nativeCode: 'ko'
-    },
-    { 
-      code: 'AE', 
-      name: 'India (Dubai)', 
-      flag: '🇦🇪', 
-      description: 'Bollywood hip-hop, luxury lifestyle',
-      color: '#7B1FA2',
-      nativeLanguage: 'हिन्दी',
-      nativeCode: 'hi'
-    },
-  ];
-
-  const currentGeography = geographies.find(g => g.code === selectedGeography) || geographies[0];
-
-  const languageOptions = [
-    { id: 'english', name: 'English', flag: '🇺🇸', code: 'en' },
-    { id: 'native', name: currentGeography.nativeLanguage, flag: currentGeography.flag, code: currentGeography.nativeCode }
-  ];
 
   const getTrendingByGeography = () => {
     const trendingByRegion = {
@@ -552,105 +508,7 @@ export default function SearchScreen() {
   const categories = getCategoriesByGeography();
   const viralStories = getViralStoriesByGeography();
 
-  const renderGeographyModal = () => (
-    <Modal
-      visible={showGeographyModal}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={() => setShowGeographyModal(false)}
-    >
-      <TouchableOpacity 
-        style={styles.modalOverlay}
-        activeOpacity={1}
-        onPress={() => setShowGeographyModal(false)}
-      >
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Explore Culture Worldwide</Text>
-            <Text style={styles.modalSubtitle}>Discover music and trends from different regions</Text>
-          </View>
-          
-          <ScrollView style={styles.geographyList} showsVerticalScrollIndicator={false}>
-            {geographies.map((geography) => (
-              <TouchableOpacity
-                key={geography.code}
-                style={[
-                  styles.geographyItem,
-                  selectedGeography === geography.code && styles.selectedGeographyItem,
-                  { borderLeftColor: geography.color }
-                ]}
-                onPress={() => {
-                  setSelectedGeography(geography.code);
-                  setShowGeographyModal(false);
-                  setActiveStoryIndex(0); // Reset to first story when geography changes
-                  setSelectedLanguage('english'); // Reset to English when changing geography
-                }}
-              >
-                <View style={styles.geographyInfo}>
-                  <Text style={styles.geographyFlag}>{geography.flag}</Text>
-                  <View style={styles.geographyDetails}>
-                    <Text style={styles.geographyName}>{geography.name}</Text>
-                    <Text style={styles.geographyDescription}>{geography.description}</Text>
-                    <Text style={styles.geographyLanguage}>Native: {geography.nativeLanguage}</Text>
-                  </View>
-                </View>
-                {selectedGeography === geography.code && (
-                  <Check size={20} color={geography.color} />
-                )}
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  );
-
-  const renderLanguageModal = () => (
-    <Modal
-      visible={showLanguageModal}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={() => setShowLanguageModal(false)}
-    >
-      <TouchableOpacity 
-        style={styles.modalOverlay}
-        activeOpacity={1}
-        onPress={() => setShowLanguageModal(false)}
-      >
-        <View style={styles.languageModalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Choose Language</Text>
-            <Text style={styles.modalSubtitle}>Select your preferred language for {currentGeography.name}</Text>
-          </View>
-          
-          <View style={styles.languageOptions}>
-            {languageOptions.map((language) => (
-              <TouchableOpacity
-                key={language.id}
-                style={[
-                  styles.languageOption,
-                  selectedLanguage === language.id && styles.selectedLanguageOption,
-                  { borderColor: currentGeography.color }
-                ]}
-                onPress={() => {
-                  setSelectedLanguage(language.id);
-                  setShowLanguageModal(false);
-                }}
-              >
-                <View style={styles.languageInfo}>
-                  <Text style={styles.languageFlag}>{language.flag}</Text>
-                  <Text style={styles.languageName}>{language.name}</Text>
-                </View>
-                {selectedLanguage === language.id && (
-                  <Check size={20} color={currentGeography.color} />
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  );
+  // Modal functions removed - now using global RegionLanguageSelector component
 
   const renderStoryCard = (story: any, index: number) => (
     <TouchableOpacity
@@ -789,90 +647,7 @@ export default function SearchScreen() {
     );
   };
 
-  const getSearchPlaceholder = () => {
-    if (selectedLanguage === 'native') {
-      switch (selectedGeography) {
-        case 'ZA': return `Soek in ${currentGeography.name}...`;
-        case 'SA': return `Buscar en ${currentGeography.name}...`;
-        case 'KR': return `${currentGeography.name}에서 검색...`;
-        case 'AE': return `${currentGeography.name} में खोजें...`;
-        default: return `Search in ${currentGeography.name}...`;
-      }
-    }
-    return `Search in ${currentGeography.name}...`;
-  };
-
-  const getUIText = () => {
-    if (selectedLanguage === 'native') {
-      switch (selectedGeography) {
-        case 'ZA':
-          return {
-            search: 'Soek',
-            trending: 'Trending in',
-            viralCulture: 'Virale Kultuur',
-            seeWhatsTrending: 'Sien wat trending is in',
-            browseCategories: 'Blaai Kategorieë',
-            popularIn: 'Gewild in',
-            exploring: 'Verken',
-            switchRegion: 'Verander Streek'
-          };
-        case 'SA':
-          return {
-            search: 'Buscar',
-            trending: 'Tendencias en',
-            viralCulture: 'Cultura Viral',
-            seeWhatsTrending: 'Ve lo que está en tendencia en',
-            browseCategories: 'Explorar Categorías',
-            popularIn: 'Popular en',
-            exploring: 'Explorando',
-            switchRegion: 'Cambiar Región'
-          };
-        case 'KR':
-          return {
-            search: '검색',
-            trending: '트렌딩 in',
-            viralCulture: '바이럴 문화',
-            seeWhatsTrending: '트렌딩 보기',
-            browseCategories: '카테고리 탐색',
-            popularIn: '인기 in',
-            exploring: '탐색 중',
-            switchRegion: '지역 변경'
-          };
-        case 'AE':
-          return {
-            search: 'खोज',
-            trending: 'ट्रेंडिंग in',
-            viralCulture: 'वायरल संस्कृति',
-            seeWhatsTrending: 'ट्रेंडिंग देखें',
-            browseCategories: 'श्रेणियां ब्राउज़ करें',
-            popularIn: 'लोकप्रिय in',
-            exploring: 'खोज रहे हैं',
-            switchRegion: 'क्षेत्र बदलें'
-          };
-        default:
-          return {
-            search: 'Search',
-            trending: 'Trending in',
-            viralCulture: 'Viral Culture',
-            seeWhatsTrending: 'See what\'s trending in',
-            browseCategories: 'Browse Categories',
-            popularIn: 'Popular in',
-            exploring: 'Exploring',
-            switchRegion: 'Switch Region'
-          };
-      }
-    }
-    return {
-      search: 'Search',
-      trending: 'Trending in',
-      viralCulture: 'Viral Culture',
-      seeWhatsTrending: 'See what\'s trending in',
-      browseCategories: 'Browse Categories',
-      popularIn: 'Popular in',
-      exploring: 'Exploring',
-      switchRegion: 'Switch Region'
-    };
-  };
+  // Using global getUIText and getSearchPlaceholder from useRegion hook
 
   const uiText = getUIText();
 
@@ -881,28 +656,7 @@ export default function SearchScreen() {
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <Text style={styles.title}>{uiText.search}</Text>
-          <View style={styles.selectorContainer}>
-            <TouchableOpacity 
-              style={[styles.geographySelector, { backgroundColor: currentGeography.color + '20', borderColor: currentGeography.color }]}
-              onPress={() => setShowGeographyModal(true)}
-            >
-              <Globe size={16} color={currentGeography.color} />
-              <Text style={styles.geographyFlag}>{currentGeography.flag}</Text>
-              <Text style={[styles.geographyCode, { color: currentGeography.color }]}>{currentGeography.code}</Text>
-              <ChevronDown size={14} color={currentGeography.color} />
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.languageSelector, { backgroundColor: currentGeography.color + '15', borderColor: currentGeography.color }]}
-              onPress={() => setShowLanguageModal(true)}
-            >
-              <Languages size={14} color={currentGeography.color} />
-              <Text style={[styles.languageText, { color: currentGeography.color }]}>
-                {selectedLanguage === 'english' ? 'EN' : languageOptions.find(l => l.id === 'native')?.code.toUpperCase()}
-              </Text>
-              <ChevronDown size={12} color={currentGeography.color} />
-            </TouchableOpacity>
-          </View>
+          <RegionLanguageSelector />
         </View>
         
         <View style={styles.searchContainer}>
@@ -967,14 +721,7 @@ export default function SearchScreen() {
             <View style={styles.section}>
               <View style={styles.regionInfo}>
                 <Text style={styles.regionInfoTitle}>🌍 {uiText.exploring} {currentGeography.name}</Text>
-                <Text style={styles.regionInfoText}>{currentGeography.description}. Discover the hottest tracks, trending artists, and exclusive products from the {currentGeography.name} scene.</Text>
-                <TouchableOpacity 
-                  style={[styles.switchRegionButton, { backgroundColor: currentGeography.color }]}
-                  onPress={() => setShowGeographyModal(true)}
-                >
-                  <Globe size={16} color="#fff" />
-                  <Text style={styles.switchRegionText}>{uiText.switchRegion}</Text>
-                </TouchableOpacity>
+                <Text style={styles.regionInfoText}>{currentGeography.description}. {uiText.regionDescription} {currentGeography.name} {uiText.musicScene}</Text>
               </View>
             </View>
           </>
@@ -991,8 +738,6 @@ export default function SearchScreen() {
         )}
       </ScrollView>
 
-      {renderGeographyModal()}
-      {renderLanguageModal()}
       <MusicPlayer />
     </View>
   );
