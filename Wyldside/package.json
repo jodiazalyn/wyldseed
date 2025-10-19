@@ -1,6 +1,5 @@
 {
-  "name": "wyldseed",
-  "description": "A music discovery, social networking, and lifestyle platform with AI-powered recommendations",
+  "name": "bolt-expo-starter",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "private": true,
