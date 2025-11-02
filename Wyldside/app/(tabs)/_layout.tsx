@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Tabs } from 'expo-router';
-import { Chrome as Home, Music, ShoppingBag, User, Users, Grid3x3 as Grid3X3, Search, Menu } from 'lucide-react-native';
+import { Chrome as Home, Music, ShoppingBag, User, Users, Grid3x3 as Grid3X3, Search, Menu, X } from 'lucide-react-native';
 import { View, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { useRegion } from '@/hooks/useRegionContext';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
@@ -11,12 +12,11 @@ const FloatingNavigation = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { getUIText } = useRegion();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const uiText = getUIText();
   
   const navItems = [
-    { name: 'menu', title: uiText.menu, icon: Menu, route: null }, // Toggle button - no route
     { name: 'index', title: uiText.home, icon: Home, route: '/' },
     { name: 'music', title: uiText.music, icon: Music, route: '/music' },
     { name: 'categories', title: uiText.categories, icon: Grid3X3, route: '/categories' },
@@ -28,54 +28,63 @@ const FloatingNavigation = () => {
 
   const handleNavigation = (route: string) => {
     router.push(route as any);
-    setIsExpanded(false);
+    setIsMenuOpen(false);
   };
 
   return (
-    <View style={styles.floatingNavContainer}>
-      {navItems.map((item, index) => {
-        const IconComponent = item.icon;
-        const isActive = item.route && (pathname === item.route || pathname.startsWith(`/${item.name}`));
-        
-        return (
-          <TouchableOpacity
-            key={item.name}
-            style={[
-              styles.floatingNavItem,
-              isActive && styles.floatingNavItemActive,
-              { 
-                transform: [{ 
-                  translateY: isExpanded ? 0 : (index * -60) 
-                }],
-                opacity: isExpanded ? 1 : (index === 0 ? 1 : 0),
-              }
-            ]}
-            onPress={() => {
-              if (index === 0) {
-                // Toggle menu for the first "Menu" button
-                setIsExpanded(!isExpanded);
-              } else if (item.route) {
-                // Navigate for all other items
-                handleNavigation(item.route);
-              }
-            }}
-            activeOpacity={0.8}
-          >
-            <View style={[styles.iconContainer, isActive && styles.iconContainerActive]}>
-              <IconComponent 
-                size={20} 
-                color={isActive ? '#fff' : '#999'} 
-              />
-            </View>
-            {(isExpanded || index === 0) && (
-              <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>
-                {item.title}
-              </Text>
-            )}
-          </TouchableOpacity>
-        );
-      })}
-    </View>
+    <>
+      {/* Floating Action Button */}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => setIsMenuOpen(!isMenuOpen)}
+        activeOpacity={0.8}
+      >
+        <LinearGradient
+          colors={['#8B5CF6', '#6D28D9']}
+          style={styles.fabGradient}
+        >
+          {isMenuOpen ? (
+            <X size={24} color="#fff" />
+          ) : (
+            <Menu size={24} color="#fff" />
+          )}
+        </LinearGradient>
+      </TouchableOpacity>
+
+      {/* Navigation Menu - Absolutely positioned, not a Modal */}
+      {isMenuOpen && (
+        <View style={styles.menuContainer} pointerEvents="box-none">
+          <View style={styles.menuContent}>
+            {navItems.map((item) => {
+              const IconComponent = item.icon;
+              const isActive = pathname === item.route || pathname.startsWith(`/${item.name}`);
+              
+              return (
+                <TouchableOpacity
+                  key={item.name}
+                  style={[
+                    styles.menuItem,
+                    isActive && styles.menuItemActive
+                  ]}
+                  onPress={() => handleNavigation(item.route)}
+                  activeOpacity={0.8}
+                >
+                  <View style={[styles.menuIconContainer, isActive && styles.menuIconContainerActive]}>
+                    <IconComponent 
+                      size={20} 
+                      color={isActive ? '#fff' : '#999'} 
+                    />
+                  </View>
+                  <Text style={[styles.menuItemTitle, isActive && styles.menuItemTitleActive]}>
+                    {item.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      )}
+    </>
   );
 };
 
@@ -159,14 +168,46 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  floatingNavContainer: {
+  // Floating Action Button
+  fab: {
     position: 'absolute',
     right: 20,
-    bottom: 100,
-    alignItems: 'flex-end',
-    zIndex: 1000,
+    bottom: 120, // Above the music player
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    zIndex: 999, // Below music player but above content
   },
-  floatingNavItem: {
+  fabGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  // Menu Container
+  menuContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    paddingTop: 60,
+    paddingRight: 20,
+    paddingBottom: 120, // Space for music player
+    zIndex: 998, // Below FAB but above content
+  },
+  menuContent: {
+    alignItems: 'flex-end',
+  },
+  menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(26, 26, 26, 0.95)',
@@ -174,6 +215,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     marginBottom: 12,
+    minWidth: 200,
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -182,11 +224,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  floatingNavItemActive: {
+  menuItemActive: {
     backgroundColor: 'rgba(139, 92, 246, 0.9)',
     borderColor: '#8B5CF6',
   },
-  iconContainer: {
+  menuIconContainer: {
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -194,17 +236,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
-  iconContainerActive: {
+  menuIconContainerActive: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
-  navLabel: {
+  menuItemTitle: {
     fontSize: 14,
     fontWeight: '600',
     color: '#999',
     marginLeft: 12,
     minWidth: 80,
   },
-  navLabelActive: {
+  menuItemTitleActive: {
     color: '#fff',
   },
 }); 
