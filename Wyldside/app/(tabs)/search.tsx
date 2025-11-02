@@ -671,7 +671,7 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
         {!searchQuery && (
           <>
             <View style={styles.section}>
@@ -816,6 +816,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+  },
+  contentContainer: {
+    paddingBottom: 100, // Add padding for music player
   },
   section: {
     marginBottom: 32,

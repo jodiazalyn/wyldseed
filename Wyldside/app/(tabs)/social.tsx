@@ -974,7 +974,7 @@ export default function SocialFeedScreen() {
         </ScrollView>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
         {filteredPosts.map(renderPost)}
       </ScrollView>
 
@@ -1078,6 +1078,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+  },
+  contentContainer: {
+    paddingBottom: 100,
   },
   postCard: {
     backgroundColor: '#2a2a2a',

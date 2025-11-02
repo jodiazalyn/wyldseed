@@ -416,7 +416,7 @@ export default function HomeScreen() {
         </View>
       </LinearGradient>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
         {/* Music Tile */}
         <View style={styles.section}>
           <TouchableOpacity 
@@ -704,6 +704,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+  },
+  contentContainer: {
+    paddingBottom: 100, // Add padding for music player
   },
   section: {
     marginBottom: 32,

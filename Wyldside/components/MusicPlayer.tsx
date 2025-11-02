@@ -490,9 +490,19 @@ export function MusicPlayer() {
 
 const styles = StyleSheet.create({
   container: {
+    position: 'absolute',
+    bottom: 0, // Position at the bottom of screen
+    left: 0,
+    right: 0,
     backgroundColor: '#2a2a2a',
     borderTopWidth: 1,
     borderTopColor: '#333',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 10,
+    zIndex: 1000,
   },
   progressBar: {
     height: 3,
