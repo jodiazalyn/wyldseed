@@ -1376,7 +1376,7 @@ export default function MusicScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={activeTab === 'videos' ? { flex: 1, paddingHorizontal: 0 } : styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={activeTab === 'videos' ? { flex: 1, paddingHorizontal: 0 } : styles.content} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
         {activeTab === 'music' ? renderMusicContent() : renderVideoContent()}
       </ScrollView>
 
@@ -1470,6 +1470,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: width < 768 ? 20 : 0,
+  },
+  contentContainer: {
+    paddingBottom: 100, // Add padding for music player
   },
   section: {
     marginBottom: 32,

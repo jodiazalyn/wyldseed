@@ -53,14 +53,14 @@ export default function LandingScreen() {
   }, []);
 
   const handleGetStarted = () => {
-    router.push('/onboarding');
+    router.push('/invitation');
   };
 
   const features = [
     {
       icon: <Sparkles size={28} color="#8B5CF6" />,
-      title: 'AI-Powered Personalization',
-      description: 'Your own AI agent that learns your taste and curates your entire experience',
+      title: 'Smart Personalization',
+      description: 'Machine learning algorithms that adapt to your taste and curate your experience',
     },
     {
       icon: <Music size={28} color="#EC4899" />,
@@ -120,10 +120,10 @@ export default function LandingScreen() {
             </Animated.View>
 
             <Text style={styles.logo}>WYLDSEED</Text>
-            <Text style={styles.tagline}>Where AI Meets Hip Hop Culture</Text>
+            <Text style={styles.tagline}>The World's Only Global Hip Hop Experience</Text>
             <Text style={styles.description}>
               Your personalized gateway to global hip hop - music, fashion, culture, and community
-              powered by artificial intelligence.
+              powered by machine learning algorithms.
             </Text>
           </Animated.View>
 
@@ -168,11 +168,11 @@ export default function LandingScreen() {
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
             >
-              <Text style={styles.ctaText}>Get Started - It's Free</Text>
+              <Text style={styles.ctaText}>Get Started Now</Text>
               <Sparkles size={20} color="#fff" />
             </LinearGradient>
           </TouchableOpacity>
-          <Text style={styles.ctaSubtext}>No credit card required • Takes 2 minutes</Text>
+          <Text style={styles.ctaSubtext}>Invitation only • Takes 2 minutes</Text>
         </Animated.View>
       </LinearGradient>
     </View>

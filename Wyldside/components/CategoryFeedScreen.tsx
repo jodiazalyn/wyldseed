@@ -419,14 +419,14 @@ export default function CategoryFeedScreen({
         </ScrollView>
       </View>
 
-      <ScrollView style={styles.feedContent} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.feedContent} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {posts.map(renderPost)}
       </ScrollView>
     </>
   );
 
   const renderMarketplaceTab = () => (
-    <ScrollView style={styles.marketplaceContent} showsVerticalScrollIndicator={false}>
+    <ScrollView style={styles.marketplaceContent} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
       <View style={styles.marketplaceHeader}>
         <Text style={styles.marketplaceTitle}>{categoryName} Marketplace</Text>
         <Text style={styles.marketplaceSubtitle}>Find premium {categoryName.toLowerCase()} items</Text>
@@ -478,7 +478,7 @@ export default function CategoryFeedScreen({
   );
 
   const renderProfileTab = () => (
-    <ScrollView style={styles.profileContent} showsVerticalScrollIndicator={false}>
+    <ScrollView style={styles.profileContent} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
       <View style={styles.profileHeader}>
         <Image 
           source={{ uri: 'https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg' }} 
@@ -704,6 +704,9 @@ const styles = StyleSheet.create({
   feedContent: {
     flex: 1,
     paddingHorizontal: 20,
+  },
+  scrollContent: {
+    paddingBottom: 100, // Add padding for music player
   },
   postCard: {
     backgroundColor: '#2a2a2a',
